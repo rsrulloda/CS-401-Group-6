@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Random;
 
 public class CustomerAccount {
     private String username;
@@ -33,19 +34,29 @@ public class CustomerAccount {
         password = newPassword;
     }
 
-    public void addAccount(String type, double balance) {
-        BankAccount newAccount = new BankAccount(type, balance);
+    public void addAccount(String type, float balance) {
+    	// Temporary generation of an account number
+    	Random random = null;
+    	int accountNumber = random.nextInt(999) + 1000;
+    	String accountNumberString = String.valueOf(accountNumber);
+    	
+        BankAccount newAccount = new BankAccount(type, accountNumberString, balance);
         accounts.add(newAccount);
     }
 
-    public void addAccount(String type, double balance, String nickname) {
-        BankAccount newAccount = new BankAccount(type, balance, nickname);
+    public void addAccount(String type, float balance, String nickname) {
+    	// Temporary generation of an account number
+    	Random random = null;
+    	int accountNumber = random.nextInt(999) + 1000;
+    	String accountNumberString = String.valueOf(accountNumber);
+    	
+    	BankAccount newAccount = new BankAccount(type, accountNumberString, balance, nickname);
         accounts.add(newAccount);
     }
 
     public void editAccount(int accountNumber, String newNickname) {
         for (BankAccount account : accounts) {
-            if (account.getAccountNumber() == accountNumber) {
+            if (account.getAccountNumber().equals(accountNumber)) {
                 account.setNickname(newNickname);
                 break;
             }
@@ -54,7 +65,7 @@ public class CustomerAccount {
 
     public void removeAccount(int accountNumber) {
         for (BankAccount account : accounts) {
-            if (account.getAccountNumber() == accountNumber) {
+            if (account.getAccountNumber().equals(accountNumber)) {
                 accounts.remove(account);
                 break;
             }
@@ -62,6 +73,6 @@ public class CustomerAccount {
     }
 
     public String toString() {
-        
+        return "Placeholder";
     }
 }
