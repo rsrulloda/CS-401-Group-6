@@ -27,18 +27,18 @@ public class Message implements Serializable {
 	
 	public Message(String messageType, String username, String password, String accountType, String accountNumber, float balance, String nickname, Boolean login) {
 		if (messageType.equals("CustomerLogin")) {
-            this.messageType = MessageType.CustomerLogin;
-        } else if (messageType.equals("EmployeeLogin")) {
-            this.messageType = MessageType.EmployeeLogin;
-        } else if (messageType.equals("AccountInfo")) {
-            this.messageType = MessageType.AccountInfo;
-        } else if (messageType.equals("LoginStatus")) {
-            this.messageType = MessageType.LoginStatus;
-        } else if (messageType.equals("LogoutCustomer")) {
-            this.messageType = MessageType.LogoutCustomer;
-        } else if (messageType.equals("LogoutEmployee")) {
-            this.messageType = MessageType.LogoutEmployee;
-        }
+		    this.messageType = MessageType.CustomerLogin;
+		} else if (messageType.equals("EmployeeLogin")) {
+		    this.messageType = MessageType.EmployeeLogin;
+		} else if (messageType.equals("AccountInfo")) {
+		    this.messageType = MessageType.AccountInfo;
+		} else if (messageType.equals("LoginStatus")) {
+		    this.messageType = MessageType.LoginStatus;
+		} else if (messageType.equals("LogoutCustomer")) {
+		    this.messageType = MessageType.LogoutCustomer;
+		} else if (messageType.equals("LogoutEmployee")) {
+		    this.messageType = MessageType.LogoutEmployee;
+		}
 		
 		this.username = username;
 		this.password = password;
