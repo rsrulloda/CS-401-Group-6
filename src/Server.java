@@ -99,7 +99,7 @@ public class Server{
 		if (text.getMessageType().equals("CustomerLogin")) {
 			
 			text.setStatus("success");
-            outputStream.writeObject(text);
+            		outputStream.writeObject(text);
             
 		}
 		
