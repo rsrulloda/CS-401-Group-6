@@ -10,7 +10,7 @@ public class BankAccount {
     private float balance;
     private String nickname;
 
-    public BankAccount(String accountType, String accountNumber, float balance) {
+    public BankAccount(String accountType, String accountNumber) {
         if (accountType.equals("Checking")) {
             this.accountType = AccountType.Checking;
         } else if (accountType.equals("Savings")) {
@@ -18,10 +18,10 @@ public class BankAccount {
         }
         
         this.accountNumber = accountNumber;
-        this.balance = balance;
+        this.balance = 0;
     }
     
-    public BankAccount(String accountType, String accountNumber, float balance, String nickname) {
+    public BankAccount(String accountType, String accountNumber, String nickname) {
         if (accountType.equals("Checking")) {
             this.accountType = AccountType.Checking;
         } else if (accountType.equals("Savings")) {
@@ -29,7 +29,7 @@ public class BankAccount {
         }
             
         this.accountNumber = accountNumber;
-        this.balance = balance;
+        this.balance = 0;
         this.nickname = nickname;
     }
 
@@ -58,8 +58,6 @@ public class BankAccount {
     }
 
 	public void setNickname(String newNickname) {
-		// TODO Auto-generated method stub
-		nickname = newNickname;
-	
+		nickname = newNickname;	
 	}
 }
