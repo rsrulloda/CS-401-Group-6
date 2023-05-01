@@ -2,70 +2,44 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-public class ClientHandler{
+// Client class
+class ClientHandler{
 	
-	public enum Interface{
-		ATM,
-		Teller
-	}
-	
-	protected String currentCustomer;
-	protected String currentEmployee;
-	protected Interface interFace;
-	
-	public ClientHandler(String interFace, String currentCustomer, String currentEmployee){
-		
-		if (interFace.equals("ATM")) {
-		    this.interFace = Interface.ATM;
-		}else if (interFace.equals("Teller")){
-		    this.interFace = Interface.Teller;
-		}
-		
-		this.currentCustomer = currentCustomer;
-		this.currentEmployee = currentEmployee;
-		
-	}
-	
-	public void setInterface(Interface newInterface) {
-		this.interFace =  newInterface;
-	}
-	
-	public void setCurrentCustomer(String newCurrentCustomer) {
-		this.currentCustomer =  newCurrentCustomer;
-	}
-	
-	public void setCurrentEmployee(String newCurrentEmployee) {
-		this.currentEmployee =  newCurrentEmployee;
-	}
-	
-	public Interface getInterface() {
-		return interFace;
-	}
-	
-	public String getCurrentCustomer(String newCurrentCustomer) {
-		return currentCustomer;
-	}
-	
-	public String getCurrentEmployee(String newCurrentEmployee) {
-		return currentEmployee;
-	}
-	
-	public static void main(String args[]) throws IOException, ClassNotFoundException{
-		
-		Socket s = new Socket("localhost", 7777);
-		
-		ObjectOutputStream outputStream = new ObjectOutputStream(s.getOutputStream());
-		ObjectInputStream inputStream = new ObjectInputStream(s.getInputStream());
-		
-		Message text = new Message("CustomerLogin", " ", " ", " ", " ", 0, " ", " ");
-		outputStream.writeObject(text);
-		text = (Message)inputStream.readObject();
-		
-		if(text.getStatus().equals("success")) {
-			System.out.println("Login successful");
+	// driver code
+	public static void main(String[] args)
+	{
+		// establish a connection by providing host and port
+		// number
+		try (Socket socket = new Socket("localhost", 1234)) {
 			
+			// writing to server
+			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+			// reading from server
+			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+			// object of scanner class
+			Scanner sc = new Scanner(System.in);
+			String line = null;
+
+			while (!"exit".equalsIgnoreCase(line)) {
+				
+				// reading from user
+				line = sc.nextLine();
+
+				// sending the user input to server
+				out.println(line);
+				out.flush();
+
+				// displaying server reply
+				System.out.println("Server replied "+ in.readLine());
+			}
+			
+			// closing the scanner object
+			sc.close();
 		}
-		
-        s.close();
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
