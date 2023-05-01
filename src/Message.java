@@ -2,6 +2,15 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
 	
+	public enum MessageType{
+		CustomerLogin,
+		EmployeeLogin,
+		AccountInfo,
+		LoginStatus,
+		LogoutCustomer,
+		LogoutEmployee
+	}
+	
 	//For CustomerLogin and EmployeeLogin
 	protected String username;
 	protected String password;
@@ -13,23 +22,35 @@ public class Message implements Serializable {
 	protected String nickname;
 	
 	//For LoginStatus
-	protected String status;
-	protected String messageType;
+	protected Boolean login;
+	protected MessageType messageType;
 	
-	public Message(String messageType, String username, String password, String accountType, String accountNumber, float balance, String nickname, String status) {
+	public Message(String messageType, String username, String password, String accountType, String accountNumber, float balance, String nickname, Boolean login) {
+		if (messageType.equals("CustomerLogin")) {
+            this.messageType = MessageType.CustomerLogin;
+        } else if (messageType.equals("EmployeeLogin")) {
+            this.messageType = MessageType.EmployeeLogin;
+        } else if (messageType.equals("AccountInfo")) {
+            this.messageType = MessageType.AccountInfo;
+        } else if (messageType.equals("LoginStatus")) {
+            this.messageType = MessageType.LoginStatus;
+        } else if (messageType.equals("LogoutCustomer")) {
+            this.messageType = MessageType.LogoutCustomer;
+        } else if (messageType.equals("LogoutEmployee")) {
+            this.messageType = MessageType.LogoutEmployee;
+        }
 		
-		this.messageType = messageType;
 		this.username = username;
 		this.password = password;
 		this.accountType = accountType;
 		this.accountNumber = accountNumber;
 		this.balance = balance;
 		this.nickname = nickname;
-		this.status = status;
+		this.login = login;
 		
 	}
-	
-	public String getMessageType() {
+		
+	public MessageType getMessageType() {
 		return messageType;
 	}
 	
@@ -57,11 +78,7 @@ public class Message implements Serializable {
 		return nickname;
 	}
 	
-	public void setStatus(String newStatus) {
-		this.status = newStatus ;
-	}
-	
-	public String getStatus() {
-		return status;
+	public Boolean getLogin() {
+		return login;
 	}
 }
