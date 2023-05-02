@@ -36,21 +36,21 @@ public class CustomerAccount {
 
     public void addAccount(String type, float balance) {
     	// Temporary generation of an account number
-    	Random random = null;
+    	Random random = new Random();
     	int accountNumber = random.nextInt(999) + 1000;
     	String accountNumberString = String.valueOf(accountNumber);
     	
-        BankAccount newAccount = new BankAccount(type, accountNumberString, balance);
+        BankAccount newAccount = new BankAccount(type, accountNumberString);
         accounts.add(newAccount);
     }
 
     public void addAccount(String type, float balance, String nickname) {
     	// Temporary generation of an account number
-    	Random random = null;
+    	Random random = new Random();
     	int accountNumber = random.nextInt(999) + 1000;
     	String accountNumberString = String.valueOf(accountNumber);
     	
-    	BankAccount newAccount = new BankAccount(type, accountNumberString, balance, nickname);
+    	BankAccount newAccount = new BankAccount(type, accountNumberString, nickname);
         accounts.add(newAccount);
     }
 
