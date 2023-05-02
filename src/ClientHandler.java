@@ -3,73 +3,63 @@ import java.net.*;
 import java.util.*;
 
 // Client class
-class ClientHandler{
+class ClientHandler {
 	
 	// driver code
-	public static void main(String[] args)
+	public static void main(String[] args) throws IOException
 	{
-		// establish a connection by providing host and port
-		// number
-		try (Socket clientSocket = new Socket("localhost", 1234)) {
-			
-			InputStream inputStream = null;
-	        OutputStream outputStream = null;
-	        
-	        // create a ObjectInputStream and ObjectOutputStream so we can read and send data
-	        ObjectInputStream in = null;
-	        ObjectOutputStream out = null;
 
-			try {
-				// Initialize the streams
-				inputStream = clientSocket.getInputStream();
-				outputStream = clientSocket.getOutputStream();
-				
-				in = new ObjectInputStream(inputStream);
-				out = new ObjectOutputStream(outputStream);
-				
-				Message message;
-				message = (Message) in.readObject();
-				System.out.println("Login Success");
-				
-				while ( (message = (Message) in.readObject()) != null) {
-					if(message.getMessageType().equals("success")) {
-						System.out.println("Login Success");
-					}
-					
-				}
-			}
-			catch (EOFException e) {
-				try {
-					clientSocket.close();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			} 
-			catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
+		try (Socket socket = new Socket("localhost", 1234)) {
 			
-			finally {
-				try {
-					if (outputStream != null || out != null) {
-						outputStream.close();
-					}
-					if (inputStream != null || in != null) {
-						inputStream.close();
-						clientSocket.close();
-					}
+			// writing to server
+	        // Input stream socket and output stream socket.
+	        InputStream inputStream = socket.getInputStream();
+	        OutputStream outputStream = socket.getOutputStream();
+
+	        // Create object output and input stream to send and receive objects
+	        ObjectOutputStream out = new ObjectOutputStream(outputStream);
+	        ObjectInputStream in = new ObjectInputStream(inputStream);
+
+			// object of scanner class
+			Scanner sc = new Scanner(System.in);
+	        Message returnMessage = null;
+
+	        // Create and send a login message
+	        System.out.println("Attemping Connection...");
+	        
+	        Message customerLogin = new Message("CustomerLogin");
+	        out.writeObject(customerLogin);
+	        
+	        Message logoutCustomer = new Message("LogoutCustomer");
+	        out.writeObject(logoutCustomer);
+
+	        try {
+	        	// When a success message is returned, write to console
+				returnMessage = (Message) in.readObject();
+				
+				if (returnMessage.getMessageType().equals("CustomerLogin")) {
+					System.out.println("Success!");
 				}
-				catch (IOException e) {
-					e.printStackTrace();
-				}
+				
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
 			}
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
+	        
+	        try {
+	        	// When a success message is returned, write to console
+				returnMessage = (Message) in.readObject();
+				
+				if (returnMessage.getMessageType().equals("LogoutCustomer")) {
+					System.out.println("Success!");
+				}
+				
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
+			}
+	        
+	        sc.close();
+	        System.out.println("Closing socket");
+	        socket.close();
+	    }
 	}
 }

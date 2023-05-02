@@ -17,7 +17,7 @@ public class Message implements Serializable {
 	protected String messageType;
 	
 	public Message(String messageType, String username, String password, String accountType, String accountNumber, float balance, String nickname, Boolean login) {
-
+		
 		this.messageType = messageType;
 		this.username = username;
 		this.password = password;
@@ -31,6 +31,7 @@ public class Message implements Serializable {
 	
 	public Message(String messageType) {
 		this.messageType = messageType;
+		
 	}
 		
 	public String getMessageType() {
