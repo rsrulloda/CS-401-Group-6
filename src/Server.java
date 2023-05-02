@@ -165,9 +165,10 @@ class Server {
 				while ( (message = (Message) in.readObject()) != null) {
 
 					if (message.getMessageType().equals("CustomerLogin")) {
-						boolean loginResult = verifyCustomerLogin(message.getUsername(),message.getPassword());
+						boolean loginResult = verifyCustomerLogin(message.getUsername(), message.getPassword());
 						if(loginResult) {
-							currentCustomer = message.getUsername();
+							out.writeObject(new Message("CustomerLogin"));
+							System.out.println("CustomerLogin");
 						}
 					}
 					
@@ -175,6 +176,7 @@ class Server {
 						boolean logoutResult = logoutCustomer();
 						if(logoutResult) {
 							state =  message.getLogin();
+							out.writeObject(new Message("success"));
 						}
 					}
 				}
