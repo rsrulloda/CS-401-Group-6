@@ -161,6 +161,8 @@ class Server {
 				out = new ObjectOutputStream(outputStream);
 				
 				Message message;
+				Message returnMessage = new Message("success");
+				out.writeObject(returnMessage);
 				
 				while ( (message = (Message) in.readObject()) != null) {
 
@@ -168,6 +170,7 @@ class Server {
 						boolean loginResult = verifyCustomerLogin(message.getUsername(),message.getPassword());
 						if(loginResult) {
 							currentCustomer = message.getUsername();
+							
 						}
 					}
 					

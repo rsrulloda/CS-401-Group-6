@@ -10,33 +10,63 @@ class ClientHandler{
 	{
 		// establish a connection by providing host and port
 		// number
-		try (Socket socket = new Socket("localhost", 1234)) {
+		try (Socket clientSocket = new Socket("localhost", 1234)) {
 			
-			// writing to server
-			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+			InputStream inputStream = null;
+	        OutputStream outputStream = null;
+	        
+	        // create a ObjectInputStream and ObjectOutputStream so we can read and send data
+	        ObjectInputStream in = null;
+	        ObjectOutputStream out = null;
 
-			// reading from server
-			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-			// object of scanner class
-			Scanner sc = new Scanner(System.in);
-			String line = null;
-
-			while (!"exit".equalsIgnoreCase(line)) {
+			try {
+				// Initialize the streams
+				inputStream = clientSocket.getInputStream();
+				outputStream = clientSocket.getOutputStream();
 				
-				// reading from user
-				line = sc.nextLine();
-
-				// sending the user input to server
-				out.println(line);
-				out.flush();
-
-				// displaying server reply
-				System.out.println("Server replied "+ in.readLine());
+				in = new ObjectInputStream(inputStream);
+				out = new ObjectOutputStream(outputStream);
+				
+				Message message;
+				message = (Message) in.readObject();
+				System.out.println("Login Success");
+				
+				while ( (message = (Message) in.readObject()) != null) {
+					if(message.getMessageType().equals("success")) {
+						System.out.println("Login Success");
+					}
+					
+				}
+			}
+			catch (EOFException e) {
+				try {
+					clientSocket.close();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			} 
+			catch (ClassNotFoundException e) {
+				e.printStackTrace();
 			}
 			
-			// closing the scanner object
-			sc.close();
+			finally {
+				try {
+					if (outputStream != null || out != null) {
+						outputStream.close();
+					}
+					if (inputStream != null || in != null) {
+						inputStream.close();
+						clientSocket.close();
+					}
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		catch (IOException e) {
 			e.printStackTrace();

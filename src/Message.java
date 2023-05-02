@@ -2,15 +2,6 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
 	
-	public enum MessageType{
-		CustomerLogin,
-		EmployeeLogin,
-		AccountInfo,
-		LoginStatus,
-		LogoutCustomer,
-		LogoutEmployee
-	}
-	
 	//For CustomerLogin and EmployeeLogin
 	protected String username;
 	protected String password;
@@ -23,23 +14,11 @@ public class Message implements Serializable {
 	
 	//For LoginStatus
 	protected Boolean login;
-	protected MessageType messageType;
+	protected String messageType;
 	
 	public Message(String messageType, String username, String password, String accountType, String accountNumber, float balance, String nickname, Boolean login) {
-		if (messageType.equals("CustomerLogin")) {
-            this.messageType = MessageType.CustomerLogin;
-        } else if (messageType.equals("EmployeeLogin")) {
-            this.messageType = MessageType.EmployeeLogin;
-        } else if (messageType.equals("AccountInfo")) {
-            this.messageType = MessageType.AccountInfo;
-        } else if (messageType.equals("LoginStatus")) {
-            this.messageType = MessageType.LoginStatus;
-        } else if (messageType.equals("LogoutCustomer")) {
-            this.messageType = MessageType.LogoutCustomer;
-        } else if (messageType.equals("LogoutEmployee")) {
-            this.messageType = MessageType.LogoutEmployee;
-        }
-		
+
+		this.messageType = messageType;
 		this.username = username;
 		this.password = password;
 		this.accountType = accountType;
@@ -49,8 +28,12 @@ public class Message implements Serializable {
 		this.login = login;
 		
 	}
+	
+	public Message(String messageType) {
+		this.messageType = messageType;
+	}
 		
-	public MessageType getMessageType() {
+	public String getMessageType() {
 		return messageType;
 	}
 	
