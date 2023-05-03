@@ -19,16 +19,40 @@ public class Message implements Serializable {
     // For withdraw/deposit
     protected float amount;
     
+    
+    // Withdraw/Deposit Message
     public Message(String messageType, String accountNumber, float amount) {
         this.messageType = messageType;
         this.amount = amount;
         this.accountNumber = accountNumber;
     }
     
-    public Message(String messageType, String username, String password) {
-        this.messageType = messageType;
-        this.username = username;
-        this.password = password;
+    // GetAccountInfo Message
+    public Message(String messageType, String accountNumber) {
+    	this.messageType = messageType;
+    	this.accountNumber = accountNumber;
+    }
+    
+    public Message(String messageType, String accountType, String accountNumber, float balance, String nickname) {
+    	this.messageType = messageType;
+    	this.accountType = accountType;
+    	this.accountNumber = accountNumber;
+    	this.balance = balance;
+    	this.nickname = nickname;
+    }
+    
+    // EmployeeLogin/CustomerLogin/EditAccountNickname Messages
+    public Message(String messageType, String input1, String input2) {
+    	this.messageType = messageType;
+    	
+    	if (messageType.equals("EmployeeLogin") || messageType.equals("CustomerLogin")) {
+            this.username = input1;
+            this.password = input2;
+    	} else if (messageType.equals("EditAccountNickname")) {
+    		this.accountNumber = input1;
+    		this.nickname = input2;
+    	}
+        
     }
     
     public Message(String messageType, String username, String password, String accountType, String accountNumber, float balance, String nickname, Boolean login) {
@@ -44,6 +68,7 @@ public class Message implements Serializable {
         
     }
     
+    // Success/Failure/GetAllAccountInfo Messages
     public Message(String messageType) {
         this.messageType = messageType;
         
