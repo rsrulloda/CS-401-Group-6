@@ -8,7 +8,8 @@ class Server {
 	
 	protected static ArrayList<ClientHandler> currentClients;
 	//protected ArrayList<EmployeeAccount> currentEmployees;
-	protected static ArrayList<CustomerAccount> currentCustomers = new ArrayList<CustomerAccount>();;
+	protected static ArrayList<CustomerAccount> currentCustomers = new ArrayList<CustomerAccount>();
+	protected static ArrayList<EmployeeAccount> currentEmployees = new ArrayList<EmployeeAccount>();
 	protected static ArrayList<BankAccount> accounts;
 
 	
@@ -108,6 +109,59 @@ class Server {
             	}
 		}
 		return false;
+	}
+	
+	private void loadEmployeeAccounts() {
+		
+		try {
+			File file = new File("../CS-401-Group-6/customerdata/employeeaccounts");
+			Scanner scanner = new Scanner(file); // finds file
+			scanner.useDelimiter(",|\\n"); // uses commas and new line to separate values
+			int count = 0;
+
+			while(scanner.hasNext()) { // keeps looping until no more values found
+				String username = scanner.next();
+
+				if(!username.equals("")) {
+					String password = scanner.next();
+
+					EmployeeAccount c = new EmployeeAccount(username, password);
+					currentEmployees.add(c);
+				} else {
+					break;
+				}
+			}
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found");
+		}
+
+	}
+	
+	public static void loadCustomerAccounts() {
+
+		try {
+			File file = new File("../CS-401-Group-6/customerdata/customeraccounts");
+			Scanner scanner = new Scanner(file); // finds file
+			scanner.useDelimiter(",|\\n"); // uses commas and new line to separate values
+			int count = 0;
+
+			while(scanner.hasNext()) { // keeps looping until no more values found
+				String username = scanner.next();
+
+				if(!username.equals("")) {
+					String password = scanner.next();
+
+					CustomerAccount c = new CustomerAccount(username, password);
+					currentCustomers.add(c);
+				} else {
+					break;
+				}
+			}
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found");
+		}
 	}
 	
 	public static void main(String[] args)
