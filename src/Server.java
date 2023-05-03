@@ -124,6 +124,11 @@ class Server {
 
     }
 
+	public static void addCustomerAccount(String customerUsername, String customerPassword) {
+		EmployeeAccount c = new EmployeeAccount(customerUsername, customerPassword);
+		currentEmployees.add(c);
+	}
+	
     public static void addAccount(String customerUsername, String type) {
     	
 		CustomerAccount currentCustomer = null;
