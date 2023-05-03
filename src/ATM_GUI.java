@@ -1,162 +1,593 @@
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
 
-public class ATM_GUI extends JFrame implements ActionListener 
-{
-    private JTextField textField;
-    private JPasswordField passwordField;
-    private JButton withdrawButton, depositButton, balanceButton, loginButton;
-    private JLabel balanceLabel;
+public class ATM_GUI {
+    private JFrame frame;
+    private JLabel userLabel, passLabel;
+    private JTextField userText;
+    private JPasswordField passText;
+    private JButton loginButton, logoutButton;
+    
+    private ATM atm = new ATM();
+    
+    private int selectedAccountIndex;
+    private int selectedTransferAccountIndex;
+    private ArrayList<Message> accounts;
 
-    public ATM_GUI() 
-    {
-        setTitle("ATM");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 300);
-        setResizable(false);
-        setLocationRelativeTo(null);
+    public ATM_GUI() {
+        frame = new JFrame("Customer Login");
 
-        JLabel label1 = new JLabel("ID:");
-        JLabel label2 = new JLabel("PIN:");
-        textField = new JTextField(10);
-        passwordField = new JPasswordField(10);
+        userLabel = new JLabel("Username:");
+        userLabel.setBounds(10, 10, 80, 25);
+        frame.add(userLabel);
+
+        userText = new JTextField(20);
+        userText.setBounds(100, 10, 160, 25);
+        frame.add(userText);
+
+        passLabel = new JLabel("Password:");
+        passLabel.setBounds(10, 40, 80, 25);
+        frame.add(passLabel);
+
+        passText = new JPasswordField(20);
+        passText.setBounds(100, 40, 160, 25);
+        frame.add(passText);
 
         loginButton = new JButton("Login");
-        withdrawButton = new JButton("Withdraw");
-        depositButton = new JButton("Deposit");
-        balanceButton = new JButton("Check Balance");
+        loginButton.setBounds(10, 80, 80, 25);
+        loginButton.addActionListener(new customerLogin());
+        frame.add(loginButton);
 
-        loginButton.addActionListener(this);
-        withdrawButton.addActionListener(this);
-        depositButton.addActionListener(this);
-        balanceButton.addActionListener(this);
+        logoutButton = new JButton("Logout");
+        logoutButton.setBounds(100, 80, 80, 25);
+        logoutButton.addActionListener(new logout());
+        frame.add(logoutButton);
 
-        withdrawButton.setEnabled(false);
-        depositButton.setEnabled(false);
-        balanceButton.setEnabled(false);
-
-        balanceLabel = new JLabel("Balance: $0.00");
-
-        JPanel panel1 = new JPanel(new GridLayout(2, 2));
-        panel1.add(label1);
-        panel1.add(textField);
-        panel1.add(label2);
-        panel1.add(passwordField);
-
-        JPanel panel2 = new JPanel(new GridLayout(4, 1));
-        panel2.add(loginButton);
-        panel2.add(withdrawButton);
-        panel2.add(depositButton);
-        panel2.add(balanceButton);
-
-        JPanel panel3 = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        panel3.add(balanceLabel);
-
-        setLayout(new BorderLayout());
-        add(panel1, BorderLayout.CENTER);
-        add(panel2, BorderLayout.EAST);
-        add(panel3, BorderLayout.SOUTH);
-
-        withdrawButton.setVisible(false);
-        depositButton.setVisible(false);
-        balanceButton.setVisible(false);
-        
-        JLabel titleLabel = new JLabel("ATM", SwingConstants.CENTER);
-        add(titleLabel, BorderLayout.NORTH);
-
-        setVisible(true);
+        frame.setSize(300, 150);
+        frame.setLocationRelativeTo(null);
+        frame.setLayout(null);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public void actionPerformed(ActionEvent e)
-    {
-        JButton button = (JButton) e.getSource();
 
-        if (button == loginButton)
-        {
-            withdrawButton.setEnabled(true);
-            depositButton.setEnabled(true);
-            balanceButton.setEnabled(true);
-            loginButton.setEnabled(false);
-            
-            withdrawButton.setVisible(true);
-            depositButton.setVisible(true);
-            balanceButton.setVisible(true);
-        } 
-        else if (isLoggedIn()) 
-        {
-            actionPerformed1(e);
-        } 
-        else 
-        {
-            JOptionPane.showMessageDialog(this, "Please log in first.");
+    // Function to allow JList to display multiline strings
+    public class MultilineCellRenderer extends JTextArea implements ListCellRenderer<String> {
+        public MultilineCellRenderer() {
+            setLineWrap(true);
+            setWrapStyleWord(true);
         }
-    }
 
-    public void actionPerformed1(ActionEvent e) 
-    {
-        JButton button = (JButton) e.getSource();
-
-        if (button == withdrawButton)
-        {
-            String amountString = JOptionPane.showInputDialog(this, "Enter amount to withdraw:");
-            
-            if (amountString != null)
-            {
-                double amount = Double.parseDouble(amountString);
-                
-                if (amount > 0 && amount <= getBalance()) 
-                {
-                    balanceLabel.setText("Balance: $" + String.format("%.2f", getBalance() - amount));
-                    JOptionPane.showMessageDialog(this, "Withdrawal successful.");
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(this, "Invalid amount. Please enter a positive number less than or equal to your balance.");
-                }
+        @Override
+        public Component getListCellRendererComponent(JList list, String value, int index, boolean isSelected, boolean cellHasFocus) {
+            setText(value);
+            if (isSelected) {
+                setBackground(list.getSelectionBackground());
+                setForeground(list.getSelectionForeground());
+            } else {
+                setBackground(list.getBackground());
+                setForeground(list.getForeground());
             }
-        } 
-        else if (button == depositButton) 
-        {
-            String amountString = JOptionPane.showInputDialog(this, "Enter amount to deposit:");
-            
-            if (amountString != null)
-            {
-                double amount = Double.parseDouble(amountString);
-                
-                if (amount > 0) 
-                {
-                    balanceLabel.setText("Balance: $" + String.format("%.2f", getBalance() + amount));
-                    JOptionPane.showMessageDialog(this, "Deposit successful.");
-                }
-                else
-                {
-                	JOptionPane.showMessageDialog(this, "Invalid amount. Please enter a positive number.");
-                }
-            }
-        } 
-        else if (button == balanceButton) 
-        {
-        	JOptionPane.showMessageDialog(this, "Your balance is: $" + String.format("%.2f", getBalance()));      	
+            return this;
         }
-                	
     }
     
-    private boolean isLoggedIn()
-    {
-    	//Should be updated to check if user is actually logged in
-        return true; 
+    public void mainFrame() throws ClassNotFoundException, IOException{
+        // Create Frame
+        frame = new JFrame("ATM GUI - Main");
+
+        // Create Buttons and Label
+        JButton logoutButton = new JButton("Logout");
+        logoutButton.addActionListener(new customerLogout());
+        JButton selectButton = new JButton("Select");
+        selectButton.addActionListener(new select());
+        JLabel label = new JLabel("Select an Account");
+
+        // Puts Buttons in Bottom Panel
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new FlowLayout());
+        bottomPanel.add(logoutButton);
+        bottomPanel.add(selectButton);
+
+        // Sets JList for Accounts
+        
+        JPanel panel = new JPanel();
+        BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
+        panel.setLayout(layout);
+
+        accounts = atm.fetchAllAccountInfo();
+        
+        String[] accountsArray = new String[accounts.size()]; 
+    	String account;  
+        
+        for (int i = 0; i < accounts.size(); i++) {
+        	Message currentAccount = accounts.get(i);
+        					
+        	accountsArray[i] = "Account Type: " + currentAccount.getAccountType() + "\n"
+					+ "Account Number: " + currentAccount.getAccountNumber() + "\n"
+					+ "Balance: " + String.valueOf(currentAccount.getBalance()) + "\n"
+        			+ "Nickname: " + currentAccount.getNickname() + "\n";
+        } 
+ 
+        JList accountList = new JList(accountsArray);
+        accountList.setFont(new Font("Arial", Font.BOLD, 12));
+        frame.add(accountList);
+
+
+        // Add a ListSelectionListener to the accountList
+        accountList.addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				// TODO Auto-generated method stub
+				selectedAccountIndex = accountList.getSelectedIndex();
+			}
+        });
+
+        
+        accountList.setCellRenderer(new MultilineCellRenderer());
+        
+        // Sets Main Panel
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.add(label, BorderLayout.NORTH);
+        mainPanel.add(accountList, BorderLayout.CENTER);
+        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+        // Sets Frame Settings
+        frame.add(mainPanel);
+        frame.setSize(600, 700);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+    
+    public void transferFrame() throws ClassNotFoundException, IOException{
+        // Create Frame
+        frame = new JFrame("Transfer Window");
+
+        // Create Buttons and Label
+        JButton transferButton = new JButton("Transfer");
+        transferButton.addActionListener(new transferAction());
+        JLabel label = new JLabel("Select an Account");
+        
+        // Puts Buttons in Bottom Panel
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new FlowLayout());
+        bottomPanel.add(transferButton);
+        
+        // Sets JList for Accounts
+        JPanel panel = new JPanel();
+        BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
+        panel.setLayout(layout);
+
+        accounts = atm.fetchAllAccountInfo();
+        
+        String[] accountsArray = new String[accounts.size()]; 
+    	String account;  
+        
+        for (int i = 0; i < accounts.size(); i++) {
+        	if (i == selectedAccountIndex) {
+        		continue;
+        	}
+        	
+        	Message currentAccount = accounts.get(i);
+        					
+        	accountsArray[i] = "Account Type: " + currentAccount.getAccountType() + "\n"
+					+ "Account Number: " + currentAccount.getAccountNumber() + "\n"
+					+ "Balance: " + String.valueOf(currentAccount.getBalance()) + "\n"
+        			+ "Nickname: " + currentAccount.getNickname() + "\n";
+        } 
+ 
+        JList accountList = new JList(accountsArray);
+        accountList.setFont(new Font("Arial", Font.BOLD, 12));
+        frame.add(accountList);
+
+
+        // Add a ListSelectionListener to the accountList
+        accountList.addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				// TODO Auto-generated method stub
+				selectedTransferAccountIndex = accountList.getSelectedIndex();
+			}
+        });
+
+        
+        accountList.setCellRenderer(new MultilineCellRenderer());
+        
+        // Sets Main Panel
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.add(label, BorderLayout.NORTH);
+        mainPanel.add(accountList, BorderLayout.CENTER);
+        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+        // Sets Frame Settings
+        frame.add(mainPanel);
+        frame.setSize(600, 700);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private double getBalance()
-    {
-    	//Should be updated to retrieve actual account balance
-        return 1000.00; 
+    public void accountFrame() {
+        // Create Frame
+        frame = new JFrame("atm GUI - Account");
+
+        // Create Buttons and Label
+        JButton closeAccountButton = new JButton("Close Account");
+        closeAccountButton.addActionListener(new closeAccount());
+        JButton exitButton = new JButton("Exit");
+        exitButton.addActionListener(new exit());
+        JButton withdrawButton = new JButton("Withdraw");
+        withdrawButton.addActionListener(new withdraw());
+        JButton depositButton = new JButton("Deposit");
+        depositButton.addActionListener(new deposit());
+        JButton transferButton = new JButton("Transfer");
+        transferButton.addActionListener(new transfer());
+        JLabel label = new JLabel("Current Account");
+
+        // Sets Top Panel
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new FlowLayout());
+        topPanel.add(label);
+        topPanel.add(closeAccountButton);
+
+        // Sets Center Panel
+        JPanel centerPanel = new JPanel();
+        
+        Message currentAccount = accounts.get(selectedAccountIndex);
+        
+        String accountInfoString = "Account Type: " + currentAccount.getAccountType() + "\n"
+		+ "Account Number: " + currentAccount.getAccountNumber() + "\n"
+		+ "Balance: " + String.valueOf(currentAccount.getBalance()) + "\n"
+		+ "Nickname: " + currentAccount.getNickname();
+        
+        JTextArea displayAccountInfo = new JTextArea(accountInfoString);
+        displayAccountInfo.setFont(new Font("Arial", Font.BOLD, 24));
+        
+        centerPanel.add(displayAccountInfo);
+
+        // Sets Bottom Panel
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new FlowLayout());
+        bottomPanel.add(exitButton);
+        bottomPanel.add(withdrawButton);
+        bottomPanel.add(depositButton);
+        bottomPanel.add(transferButton);
+
+        // Sets Main Panel
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.add(topPanel, BorderLayout.NORTH);
+        mainPanel.add(centerPanel, BorderLayout.CENTER);
+        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+        // Sets Frame Settings
+        frame.add(mainPanel);
+        frame.setSize(600, 700);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public static void main(String[] args) 
-    {
-        ATM_GUI atm = new ATM_GUI();
-        atm.setVisible(true);
+    public void closeAccountFrame() {
+        frame = new JFrame("Close Account");
+
+        // Sets Buttons and Label
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(new cancel());
+        JButton proceedButton = new JButton("Proceed");
+        proceedButton.addActionListener(new proceed());
+        JLabel label = new JLabel("Are you sure the customer wishes to close this account?");
+
+        // Sets Bottom Panel
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new FlowLayout());
+        bottomPanel.add(cancelButton);
+        bottomPanel.add(proceedButton);
+
+        // Sets Main Panel
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.add(label, BorderLayout.NORTH);
+        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+        // Sets Frame Settings
+        frame.add(mainPanel);
+        frame.setSize(400, 150);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
-}            
+
+    private class customerLogin implements ActionListener { // completed
+        public void actionPerformed(ActionEvent e) {
+            String user = userText.getText().trim();
+            String pass = String.valueOf(passText.getPassword()).trim();
+
+            boolean loginResult = false;
+
+            try {
+                loginResult = atm.loginCustomer(user, pass);
+            } catch (ClassNotFoundException e1) {
+                e1.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            
+            // check user credentials here
+            if (loginResult) {
+                JOptionPane.showMessageDialog(null, "Login successful");
+                frame.dispose(); // close the login frame
+
+                try {
+					mainFrame();
+				} catch (ClassNotFoundException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+            } else {
+                JOptionPane.showMessageDialog(null, "Invalid username or password");
+            }
+        }
+    }
+
+    private class customerLogout implements ActionListener { // completed
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+        }
+    }
+
+    private class select implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            
+            accounts.get(selectedAccountIndex);
+            accountFrame();
+            
+            /*
+            try {
+				mainFrame();
+			} catch (ClassNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			*/
+        }
+    }
+
+    private class openAccount implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            
+    		// Request the type
+    		String accountType;
+    		int choice;
+    		
+    		 String[] accountTypes = {
+    				 	"Checking",
+    				 	"Savings",
+    				 	};
+    		 
+    		 choice = JOptionPane.showOptionDialog(null,
+    				 "Select a bank account type", 
+    				 "Account Type", 
+    				 JOptionPane.OK_OPTION, 
+    				 JOptionPane.QUESTION_MESSAGE, 
+    				 null, 
+    				 accountTypes,
+    				 accountTypes[accountTypes.length - 1]);
+    		 
+    		if (choice == -1) {
+    			return;		// dialog was cancelled
+    		}
+    		 
+    		accountType = accountTypes[choice];
+            
+            try {
+            	atm.openBankAccount(accountType);
+				mainFrame();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        }
+    }
+
+    private class changePassword implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            try {
+				mainFrame();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        }
+    }
+
+    private class closeAccount implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            try {
+				mainFrame();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        }
+    }
+
+    private class exit implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            try {
+				mainFrame();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        }
+    }
+
+    private class withdraw implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            
+            Message currentAccount = accounts.get(selectedAccountIndex);
+            
+            // Request the withdrawal amount
+            String input = JOptionPane.showInputDialog(null, "Please enter a withdrawal amount",
+                    "Withdrawal", JOptionPane.QUESTION_MESSAGE);
+            
+            float amount; 
+            
+            if (input == null) {
+                amount = 0;
+            } else {
+            	amount = Float.parseFloat(input);
+            }
+            
+            try {
+            	atm.withdrawRequest(currentAccount.getAccountNumber(), amount);
+            	accounts = atm.fetchAllAccountInfo();
+				accountFrame();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        }
+    }
+
+    private class deposit implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            
+            Message currentAccount = accounts.get(selectedAccountIndex);
+            
+            // Request the deposit amount
+            String input = JOptionPane.showInputDialog(null, "Please enter a deposit amount",
+                    "Deposit", JOptionPane.QUESTION_MESSAGE);
+            
+            float amount; 
+            
+            if (input == null) {
+                amount = 0;
+            } else {
+            	amount = Float.parseFloat(input);
+            }          
+            try {
+            	atm.depositRequest(currentAccount.getAccountNumber(), amount);
+               	accounts = atm.fetchAllAccountInfo();
+    			accountFrame();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        }
+    }
+
+    private class transfer implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            try {
+            	transferFrame();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        }
+    }
+    
+    private class transferAction implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            
+            Message currentAccount1 = accounts.get(selectedAccountIndex);
+            Message currentAccount2 = accounts.get(selectedTransferAccountIndex);
+            // Request the deposit amount
+            String input = JOptionPane.showInputDialog(null, "Please enter a transfer amount",
+                    "Transfer", JOptionPane.QUESTION_MESSAGE);
+            
+            float amount;
+            
+            if (input == null) {
+                amount = 0;
+            } else {
+            	amount = Float.parseFloat(input);
+            } 
+            
+            
+            try {
+            	atm.transfer(currentAccount1.getAccountNumber(), currentAccount2.getAccountNumber(), amount);
+               	accounts = atm.fetchAllAccountInfo();
+    			accountFrame();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        }
+    }
+
+    private class editName implements ActionListener {
+    	
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            
+            Message currentAccount = accounts.get(selectedAccountIndex);
+            
+            // Request the deposit amount
+            String input = JOptionPane.showInputDialog(null, "Please enter a nickname",
+                    "Edit Nickname", JOptionPane.QUESTION_MESSAGE);
+   
+            String newNickname = String.valueOf(input);
+            try {
+            	
+            	atm.editAccountNickname(currentAccount.getAccountNumber(), newNickname);
+            	accounts = atm.fetchAllAccountInfo();
+            	accountFrame();
+    			
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        }
+    }
+
+    private class cancel implements ActionListener { // completed
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            accountFrame();
+        }
+    }
+
+    private class proceed implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            accountFrame();
+        }
+    }
+
+    private class logout implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+        }
+    }
+
+
+    public static void main(String[] args) {
+        new ATM_GUI();
+    }
+}
