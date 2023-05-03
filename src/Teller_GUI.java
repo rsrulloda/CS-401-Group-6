@@ -245,12 +245,21 @@ public class Teller_GUI {
 
     private class customerLogin implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            String user = userText.getText();
-            String pass = String.valueOf(passText.getPassword());
+            String user = userText.getText().trim();
+            String pass = String.valueOf(passText.getPassword()).trim();
 
+            boolean loginResult = false;
+
+            try {
+                loginResult = teller.loginCustomer(user, pass);
+            } catch (ClassNotFoundException e1) {
+                e1.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
             
             // check user credentials here
-            if (user.equals("admin") && pass.equals("password")) {
+            if (loginResult) {
                 JOptionPane.showMessageDialog(null, "Login successful");
                 frame.dispose(); // close the login frame
 
