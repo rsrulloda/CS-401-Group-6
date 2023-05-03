@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 public class Teller_GUI {
     private JFrame frame;
@@ -9,6 +10,8 @@ public class Teller_GUI {
     private JTextField userText;
     private JPasswordField passText;
     private JButton loginButton;
+    
+    private Teller teller = new Teller();
 
     public Teller_GUI() {
         frame = new JFrame("Teller GUI - Teller Login");
@@ -191,17 +194,24 @@ public class Teller_GUI {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private class tellerLogin implements ActionListener {
+    private class tellerLogin implements ActionListener  {
         public void actionPerformed(ActionEvent e) {
-            String user = userText.getText();
-            String pass = String.valueOf(passText.getPassword());
+            String user = userText.getText().trim();
+            String pass = String.valueOf(passText.getPassword()).trim();
 
+            boolean loginResult = false;
+            try {
+				loginResult = teller.loginEmployee(user, pass);
+			} catch (ClassNotFoundException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+            
             // check user credentials here
-            if (user.equals("teller") && pass.equals("password")) {
+            if (loginResult) {
                 JOptionPane.showMessageDialog(null, "Login successful");
                 frame.dispose(); // close the login frame
-
-                //customerLogin();
             } else {
                 JOptionPane.showMessageDialog(null, "Invalid username or password");
             }
@@ -213,6 +223,8 @@ public class Teller_GUI {
             String user = userText.getText();
             String pass = String.valueOf(passText.getPassword());
 
+            
+            
             // check user credentials here
             if (user.equals("admin") && pass.equals("password")) {
                 JOptionPane.showMessageDialog(null, "Login successful");

@@ -7,7 +7,6 @@ import java.util.*;
 class Server {
 	
 	protected static ArrayList<ClientHandler> currentClients;
-	//protected ArrayList<EmployeeAccount> currentEmployees;
 	protected static ArrayList<CustomerAccount> currentCustomers = new ArrayList<CustomerAccount>();
 	protected static ArrayList<EmployeeAccount> currentEmployees = new ArrayList<EmployeeAccount>();
 	protected static ArrayList<BankAccount> accounts;
@@ -15,9 +14,23 @@ class Server {
 	
 	public static boolean verifyCustomerLogin(String Username, String Password){
 		for (CustomerAccount account : currentCustomers) {
-            if (account.getUsername().equals(Username) && account.getPassword().equals(Password)) {
+            if (account.getUsername().trim().equals(Username) && account.getPassword().trim().equals(Password)) {
 	            	return true;
             	}
+		}
+		return false;
+    }
+	
+	public static boolean verifyEmployeeLogin(String Username, String Password){
+		
+		System.out.println("Trying to authenticate user, password: " + Username + "," + Password);
+		
+		for (EmployeeAccount account : currentEmployees) {
+			System.out.println("Employee has user: " + account.getUsername() + " and pass: " + account.getPassword());
+			
+            if (account.getUsername().equals(Username) && account.getPassword().equals(Password)) {
+	            	return true;
+        	}
 		}
 		return false;
     }
@@ -111,19 +124,21 @@ class Server {
 		return false;
 	}
 	
-	private void loadEmployeeAccounts() {
+	private static void loadEmployeeAccounts() {
 		
 		try {
-			File file = new File("../CS-401-Group-6/customerdata/employeeaccounts");
+			File file = new File("employeeaccounts.txt");
 			Scanner scanner = new Scanner(file); // finds file
 			scanner.useDelimiter(",|\\n"); // uses commas and new line to separate values
 			int count = 0;
 
 			while(scanner.hasNext()) { // keeps looping until no more values found
-				String username = scanner.next();
+				String username = scanner.next().trim();
 
 				if(!username.equals("")) {
-					String password = scanner.next();
+					String password = scanner.next().trim();
+					
+					System.out.println(username);
 
 					EmployeeAccount c = new EmployeeAccount(username, password);
 					currentEmployees.add(c);
@@ -141,16 +156,16 @@ class Server {
 	public static void loadCustomerAccounts() {
 
 		try {
-			File file = new File("../CS-401-Group-6/customerdata/customeraccounts");
+			File file = new File("customeraccounts.txt");
 			Scanner scanner = new Scanner(file); // finds file
 			scanner.useDelimiter(",|\\n"); // uses commas and new line to separate values
 			int count = 0;
 
 			while(scanner.hasNext()) { // keeps looping until no more values found
-				String username = scanner.next();
+				String username = scanner.next().trim();
 
 				if(!username.equals("")) {
-					String password = scanner.next();
+					String password = scanner.next().trim();
 
 					CustomerAccount c = new CustomerAccount(username, password);
 					currentCustomers.add(c);
@@ -169,6 +184,8 @@ class Server {
 		CustomerAccount c1 = new CustomerAccount("Customer1", "123");
 		currentCustomers.add(c1);
 		c1.addAccount("Checking", 500);
+		
+		loadEmployeeAccounts();
 		
 		ServerSocket server = null;
 
@@ -241,26 +258,55 @@ class Server {
 						
 						if(loginResult) {
 							currentCustomer = message.getUsername();
-							out.writeObject(new Message("CustomerLogin"));
+							out.writeObject(new Message("Success"));
 							System.out.println("CustomerLogin");
+						}
+						else {
+							out.writeObject(new Message("Failure"));
+						}
+					}
+					
+					if (message.getMessageType().equals("CustomerLogout")) {
+						currentCustomer = "";
+
+						out.writeObject(new Message("Success"));
+						System.out.println("CustomerLogout");
+					
+					}
+					
+					if (message.getMessageType().equals("EmployeeLogin")) {
+						boolean loginResult = verifyEmployeeLogin(message.getUsername(), message.getPassword());
+					
+						System.out.println(loginResult);
+						
+						if(loginResult) {
+							currentEmployee = message.getUsername();
+							out.writeObject(new Message("Success"));
+							System.out.println("EmployeeLogin");
+						}
+						else {
+							out.writeObject(new Message("Failure"));
 						}
 					}
 					
 					if (message.getMessageType().equals("Withdraw")) {
 						boolean loginResult = withdraw(currentCustomer, message.getAccountNumber(), message.getAmount());
+						
 						if(loginResult) {
-							out.writeObject(new Message("Withdraw"));
+							out.writeObject(new Message("Success"));
 							System.out.println("Withdraw");
 						}
 					}
 					
-					else if (message.getMessageType().equals("LogoutCustomer")) {
-						boolean loginResult = logoutCustomer();
+					if (message.getMessageType().equals("Despoit")) {
+						boolean loginResult = withdraw(currentCustomer, message.getAccountNumber(), message.getAmount());
+						
 						if(loginResult) {
-							out.writeObject(new Message("LogoutCustomer"));
-							System.out.println("LogoutCustomer");
+							out.writeObject(new Message("Success"));
+							System.out.println("Withdraw");
 						}
 					}
+					
 				}
 			}
 			catch (EOFException e) {
