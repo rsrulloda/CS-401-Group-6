@@ -48,6 +48,15 @@ public class BankAccount {
     public String getNickname() {
         return nickname;
     }
+    
+    public void withdraw(float amount) {
+    	balance = balance - amount;
+    }
+    
+    public void deposit(float amount) {
+    	balance = balance + amount;
+    }
+
 
     public void setBalance(float balance) {
         this.balance = balance;

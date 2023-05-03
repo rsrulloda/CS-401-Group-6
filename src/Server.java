@@ -7,28 +7,56 @@ import java.util.*;
 class Server {
 	
 	protected static ArrayList<ClientHandler> currentClients;
-	//protected ArrayList<EmployeeAccount> currentEmployees;
-	protected static ArrayList<CustomerAccount> currentCustomers;
+	protected static ArrayList<CustomerAccount> currentCustomers = new ArrayList<CustomerAccount>();
+	protected static ArrayList<EmployeeAccount> currentEmployees = new ArrayList<EmployeeAccount>();
 	protected static ArrayList<BankAccount> accounts;
 
 	
 	public static boolean verifyCustomerLogin(String Username, String Password){
 		for (CustomerAccount account : currentCustomers) {
-            if (account.getUsername().equals(Username) && account.getPassword().equals(Password)) {
+            if (account.getUsername().trim().equals(Username) && account.getPassword().trim().equals(Password)) {
 	            	return true;
             	}
 		}
 		return false;
     }
 	
-	public static float withdraw(String accountNumber, float amount) {
-		for(BankAccount account : accounts) {
-			if(account.getAccountNumber().equals(accountNumber)) {
-				amount = account.getBalance() - amount; 
+	public static boolean verifyEmployeeLogin(String Username, String Password){
+		
+		System.out.println("Trying to authenticate user, password: " + Username + "," + Password);
+		
+		for (EmployeeAccount account : currentEmployees) {
+			System.out.println("Employee has user: " + account.getUsername() + " and pass: " + account.getPassword());
+			
+            if (account.getUsername().equals(Username) && account.getPassword().equals(Password)) {
+	            	return true;
+        	}
+		}
+		return false;
+    }
+	
+	public static boolean withdraw(String customerUsername,String accountNumber, float amount) {
+		
+		CustomerAccount currentCustomer = null;
+		System.out.println(currentCustomers.size());
+		
+		for(CustomerAccount account : currentCustomers) {
+			System.out.println(account.getUsername());
+			System.out.println(customerUsername);
+			if(account.getUsername().equals(customerUsername)) {
+				System.out.println("Account found");
+				currentCustomer = account;
 			}
 		}
 		
-		return amount;
+		for(BankAccount account :  currentCustomer.getAccounts()) {
+			if(account.getAccountNumber().equals(accountNumber)) {
+				account.withdraw(amount);
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	public static float deposit(String accountNumber, float amount) {
@@ -75,8 +103,6 @@ class Server {
                 break;
             }
         }
-
-
     }
     
     public void editAccount(String accountNumber, String nickname) {
@@ -97,21 +123,49 @@ class Server {
 		}
 		return false;
 	}
-
-	public static void loadCustomerAccounts() {
-		currentCustomers = new ArrayList<CustomerAccount>();
-
+	
+	private static void loadEmployeeAccounts() {
+		
 		try {
-			File file = new File("../CS-401-Group-6/customerdata/customeraccounts");
+			File file = new File("employeeaccounts.txt");
 			Scanner scanner = new Scanner(file); // finds file
 			scanner.useDelimiter(",|\\n"); // uses commas and new line to separate values
 			int count = 0;
 
 			while(scanner.hasNext()) { // keeps looping until no more values found
-				String username = scanner.next();
+				String username = scanner.next().trim();
 
 				if(!username.equals("")) {
-					String password = scanner.next();
+					String password = scanner.next().trim();
+					
+					System.out.println(username);
+
+					EmployeeAccount c = new EmployeeAccount(username, password);
+					currentEmployees.add(c);
+				} else {
+					break;
+				}
+			}
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found");
+		}
+
+	}
+	
+	public static void loadCustomerAccounts() {
+
+		try {
+			File file = new File("customeraccounts.txt");
+			Scanner scanner = new Scanner(file); // finds file
+			scanner.useDelimiter(",|\\n"); // uses commas and new line to separate values
+			int count = 0;
+
+			while(scanner.hasNext()) { // keeps looping until no more values found
+				String username = scanner.next().trim();
+
+				if(!username.equals("")) {
+					String password = scanner.next().trim();
 
 					CustomerAccount c = new CustomerAccount(username, password);
 					currentCustomers.add(c);
@@ -124,19 +178,15 @@ class Server {
 			System.out.println("File not found");
 		}
 	}
-
-	public static void loadBankAccounts(CustomerAccount customerAccount) {
-
-	}
 	
 	public static void main(String[] args)
 	{
-		loadCustomerAccounts();
-
-		for(int i=0;i<currentCustomers.size();i++) {
-			System.out.println(currentCustomers.get(i).getUsername());
-		}
-
+		CustomerAccount c1 = new CustomerAccount("Customer1", "123");
+		currentCustomers.add(c1);
+		c1.addAccount("Checking", 500);
+		
+		loadEmployeeAccounts();
+		
 		ServerSocket server = null;
 
 		try {
@@ -147,7 +197,7 @@ class Server {
 			while (true) {
 
 				Socket client = server.accept();
-				System.out.println("New client connected "+ client.getInetAddress().getHostAddress());
+				System.out.println("New client connected " + client.getInetAddress().getHostAddress());
 				ClientHandler clientSock = new ClientHandler(client);
 				new Thread(clientSock).start();
 			}
@@ -205,19 +255,58 @@ class Server {
 
 					if (message.getMessageType().equals("CustomerLogin")) {
 						boolean loginResult = verifyCustomerLogin(message.getUsername(), message.getPassword());
+						
 						if(loginResult) {
-							out.writeObject(new Message("CustomerLogin"));
+							currentCustomer = message.getUsername();
+							out.writeObject(new Message("Success"));
 							System.out.println("CustomerLogin");
+						}
+						else {
+							out.writeObject(new Message("Failure"));
 						}
 					}
 					
-					else if (message.getMessageType().equals("LogoutCustomer")) {
-						boolean logoutResult = logoutCustomer();
-						if(logoutResult) {
-							state =  message.getLogin();
-							out.writeObject(new Message("success"));
+					if (message.getMessageType().equals("CustomerLogout")) {
+						currentCustomer = "";
+
+						out.writeObject(new Message("Success"));
+						System.out.println("CustomerLogout");
+					
+					}
+					
+					if (message.getMessageType().equals("EmployeeLogin")) {
+						boolean loginResult = verifyEmployeeLogin(message.getUsername(), message.getPassword());
+					
+						System.out.println(loginResult);
+						
+						if(loginResult) {
+							currentEmployee = message.getUsername();
+							out.writeObject(new Message("Success"));
+							System.out.println("EmployeeLogin");
+						}
+						else {
+							out.writeObject(new Message("Failure"));
 						}
 					}
+					
+					if (message.getMessageType().equals("Withdraw")) {
+						boolean loginResult = withdraw(currentCustomer, message.getAccountNumber(), message.getAmount());
+						
+						if(loginResult) {
+							out.writeObject(new Message("Success"));
+							System.out.println("Withdraw");
+						}
+					}
+					
+					if (message.getMessageType().equals("Despoit")) {
+						boolean loginResult = withdraw(currentCustomer, message.getAccountNumber(), message.getAmount());
+						
+						if(loginResult) {
+							out.writeObject(new Message("Success"));
+							System.out.println("Withdraw");
+						}
+					}
+					
 				}
 			}
 			catch (EOFException e) {
