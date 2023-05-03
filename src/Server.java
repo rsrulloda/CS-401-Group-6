@@ -38,10 +38,11 @@ class Server {
 	public static boolean withdraw(String customerUsername,String accountNumber, float amount) {
 		
 		CustomerAccount currentCustomer = null;
-		System.out.println("Number of current customers: " + currentCustomers.size());
+		System.out.println(currentCustomers.size());
 		
 		for(CustomerAccount account : currentCustomers) {
 			System.out.println(account.getUsername());
+			System.out.println(customerUsername);
 			if(account.getUsername().equals(customerUsername)) {
 				System.out.println("Account found");
 				currentCustomer = account;
@@ -61,10 +62,11 @@ class Server {
 	public static boolean deposit(String customerUsername,String accountNumber, float amount) {
 		
 		CustomerAccount currentCustomer = null;
-		System.out.println("Number of current customers: " + currentCustomers.size());
+		System.out.println(currentCustomers.size());
 		
 		for(CustomerAccount account : currentCustomers) {
 			System.out.println(account.getUsername());
+			System.out.println(customerUsername);
 			if(account.getUsername().equals(customerUsername)) {
 				System.out.println("Account found");
 				currentCustomer = account;
@@ -73,7 +75,7 @@ class Server {
 		
 		for(BankAccount account :  currentCustomer.getAccounts()) {
 			if(account.getAccountNumber().equals(accountNumber)) {
-				account.withdraw(amount);
+				account.deposit(amount);
 				System.out.println(account.getBalance());
 			}
 		}
@@ -191,9 +193,35 @@ class Server {
 		}
 	}
 	
+	public ArrayList<Message> getAllAccountInfo(String customerUsername) {
+        CustomerAccount currentCustomer = null;
+        System.out.println(currentCustomers.size());
+        
+        ArrayList<Message> allAccountInfo = new ArrayList<Message>();
+        
+        for(CustomerAccount account : currentCustomers) {
+            System.out.println(account.getUsername());
+            System.out.println(customerUsername);
+            if(account.getUsername().equals(customerUsername)) {
+                System.out.println("Account found");
+                currentCustomer = account;
+            }
+        }
+        
+        for(BankAccount account :  currentCustomer.getAccounts()) {
+            allAccountInfo.add(new Message("AccountInfo", account.getAccountType(), account.getAccountNumber(), account.getBalance(), account.getNickname()));
+        }
+        
+        return allAccountInfo;
+        
+    }
+	
 	public static void main(String[] args)
 	{
-		loadCustomerAccounts();
+		CustomerAccount c1 = new CustomerAccount("Customer1", "123");
+		currentCustomers.add(c1);
+		c1.addAccount("Checking", 500);
+		
 		loadEmployeeAccounts();
 		
 		ServerSocket server = null;
@@ -307,7 +335,7 @@ class Server {
 						}
 					}
 					
-					if (message.getMessageType().equals("Despoit")) {
+					if (message.getMessageType().equals("Deposit")) {
 						boolean loginResult = deposit(currentCustomer, message.getAccountNumber(), message.getAmount());
 						
 						if(loginResult) {

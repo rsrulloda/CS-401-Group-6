@@ -26,7 +26,7 @@ class ClientHandler {
 			
 			// Return message
 			Message returnMessage;
-
+			
 	        // Create and send a login message
 	        System.out.println("Attemping Connection...");
 	        
@@ -42,13 +42,12 @@ class ClientHandler {
         	
         	returnMessage = (Message) in.readObject();
         	System.out.println(returnMessage.getMessageType());
-        	
+	        
         	Message deposit1 = new Message("Deposit", "1001", 10);
         	out.writeObject(deposit1);
         	
         	returnMessage = (Message) in.readObject();
         	System.out.println(returnMessage.getMessageType());
-	        
 	        
 	        sc.close();
 	        System.out.println("Closing socket");
