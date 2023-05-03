@@ -224,8 +224,6 @@ public class ATM_GUI {
         frame = new JFrame("atm GUI - Account");
 
         // Create Buttons and Label
-        JButton closeAccountButton = new JButton("Close Account");
-        closeAccountButton.addActionListener(new closeAccount());
         JButton exitButton = new JButton("Exit");
         exitButton.addActionListener(new exit());
         JButton withdrawButton = new JButton("Withdraw");
@@ -234,13 +232,14 @@ public class ATM_GUI {
         depositButton.addActionListener(new deposit());
         JButton transferButton = new JButton("Transfer");
         transferButton.addActionListener(new transfer());
+        JButton editNameButton = new JButton("Edit Name");
+        editNameButton.addActionListener(new editName());
         JLabel label = new JLabel("Current Account");
 
         // Sets Top Panel
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new FlowLayout());
         topPanel.add(label);
-        topPanel.add(closeAccountButton);
 
         // Sets Center Panel
         JPanel centerPanel = new JPanel();
@@ -264,6 +263,7 @@ public class ATM_GUI {
         bottomPanel.add(withdrawButton);
         bottomPanel.add(depositButton);
         bottomPanel.add(transferButton);
+        bottomPanel.add(editNameButton);
 
         // Sets Main Panel
         JPanel mainPanel = new JPanel();

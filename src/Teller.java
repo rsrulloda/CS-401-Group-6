@@ -151,25 +151,4 @@ public class Teller {
         }
     }
 
-    /*
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
-    	Teller teller = new Teller();
-        
-        String username = "employee1";
-        String password = "123";
-
-        try {
-            boolean loginResult = loginEmployee(username, password);
-            if (loginResult) {
-            	System.out.println("Login successful!");
-            } else {
-            	System.out.println("Login failed.");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            teller.close();
-        }
-    }
-    */
 }

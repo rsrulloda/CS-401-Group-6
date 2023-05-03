@@ -1,3 +1,5 @@
 customer1,123
 customer2,123
 customer3,123
+Ron,verysecurepassword
+AJ,thebestpassword

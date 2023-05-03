@@ -51,11 +51,11 @@ public class Message implements Serializable {
     	this.nickname = nickname;
     }
     
-    // EmployeeLogin/CustomerLogin/EditAccountNickname Messages
+    // EmployeeLogin/CustomerLogin/EditAccountNickname/OpenCustomerAccount Messages
     public Message(String messageType, String input1, String input2) {
     	this.messageType = messageType;
     	
-    	if (messageType.equals("EmployeeLogin") || messageType.equals("CustomerLogin")) {
+    	if (messageType.equals("EmployeeLogin") || messageType.equals("CustomerLogin") || messageType.equals("OpenCustomerAccount")) {
             this.username = input1;
             this.password = input2;
     	} else if (messageType.equals("EditAccountNickname")) {
