@@ -38,11 +38,10 @@ class Server {
 	public static boolean withdraw(String customerUsername,String accountNumber, float amount) {
 		
 		CustomerAccount currentCustomer = null;
-		System.out.println(currentCustomers.size());
+		System.out.println("Number of current customers: " + currentCustomers.size());
 		
 		for(CustomerAccount account : currentCustomers) {
 			System.out.println(account.getUsername());
-			System.out.println(customerUsername);
 			if(account.getUsername().equals(customerUsername)) {
 				System.out.println("Account found");
 				currentCustomer = account;
@@ -52,21 +51,34 @@ class Server {
 		for(BankAccount account :  currentCustomer.getAccounts()) {
 			if(account.getAccountNumber().equals(accountNumber)) {
 				account.withdraw(amount);
-				return true;
+				System.out.println(account.getBalance());
 			}
 		}
 		
-		return false;
+		return true;
 	}
 	
-	public static float deposit(String accountNumber, float amount) {
-		for(BankAccount account : accounts) {
-			if(account.getAccountNumber().equals(accountNumber)) {
-				amount = account.getBalance() + amount; 
+	public static boolean deposit(String customerUsername,String accountNumber, float amount) {
+		
+		CustomerAccount currentCustomer = null;
+		System.out.println("Number of current customers: " + currentCustomers.size());
+		
+		for(CustomerAccount account : currentCustomers) {
+			System.out.println(account.getUsername());
+			if(account.getUsername().equals(customerUsername)) {
+				System.out.println("Account found");
+				currentCustomer = account;
 			}
 		}
 		
-		return amount;
+		for(BankAccount account :  currentCustomer.getAccounts()) {
+			if(account.getAccountNumber().equals(accountNumber)) {
+				account.withdraw(amount);
+				System.out.println(account.getBalance());
+			}
+		}
+		
+		return true;
 	}
 	
 	public static float transfer(String account1, String account2, float amount) {
@@ -296,11 +308,11 @@ class Server {
 					}
 					
 					if (message.getMessageType().equals("Despoit")) {
-						boolean loginResult = withdraw(currentCustomer, message.getAccountNumber(), message.getAmount());
+						boolean loginResult = deposit(currentCustomer, message.getAccountNumber(), message.getAmount());
 						
 						if(loginResult) {
 							out.writeObject(new Message("Success"));
-							System.out.println("Withdraw");
+							System.out.println("Deposit");
 						}
 					}
 					
