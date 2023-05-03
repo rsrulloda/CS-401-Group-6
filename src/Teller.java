@@ -108,8 +108,19 @@ public class Teller {
         return false;
     }
 
-    public void transfer(BankAccount account1, BankAccount account2, float amount) {
-    	
+    public boolean transfer(BankAccount account1, BankAccount account2, float amount) throws IOException, ClassNotFoundException {
+        Message transferMessage = new Message("Transfer", account1, account2, amount);
+        out.writeObject(transferMessage);
+
+        returnMessage = (Message) in.readObject();
+
+        System.out.println(returnMessage.getMessageType());
+
+        if (returnMessage.getMessageType().equals("Success")) {
+            return true;
+        }
+
+        return false;
     }
 
 
