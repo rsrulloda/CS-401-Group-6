@@ -77,28 +77,79 @@ public class Teller {
     }
 
 
-    public void withdrawRequest(String accountNumber, float amount) throws IOException {
+    public boolean withdrawRequest(String accountNumber, float amount) throws IOException, ClassNotFoundException {
     	Message withdrawMessage = new Message("Withdraw", accountNumber, amount);
     	out.writeObject(withdrawMessage);
     	
+    	returnMessage = (Message) in.readObject();
+        
+        System.out.println(returnMessage.getMessageType());
+        
+        if (returnMessage.getMessageType().equals("Success")) {
+        	return true;
+        }
+        
+        return false;
+    	
     }
 
-    public void depositRequest(String accountNumber, float amount) throws IOException {
+    public boolean depositRequest(String accountNumber, float amount) throws IOException, ClassNotFoundException {
     	Message depositMessage = new Message("Deposit", accountNumber,amount);
     	out.writeObject(depositMessage);
+    	
+    	returnMessage = (Message) in.readObject();
+        
+        System.out.println(returnMessage.getMessageType());
+        
+        if (returnMessage.getMessageType().equals("Success")) {
+        	return true;
+        }
+        
+        return false;
     }
 
     public void transfer(BankAccount account1, BankAccount account2, float amount) {
     }
 
 
-    public void closeAcc(String accountNumber) {
+    public void closeBankAccount(String accountNumber) {
+    	
     }
 
-    public void openAcc() {
+    public void openBankAccount() throws IOException {
+    	Message openBankAccountMessage = new Message("OpenBankAccount");
+    	out.writeObject(openBankAccountMessage);
     }
-
-    public void editAcc(String accountNumber, String nickname) {
+    
+    public Message fetchAccountInfo(String accountNumber) throws ClassNotFoundException, IOException {
+    	Message getAccountInfoMessage = new Message("GetAccountInfo", accountNumber);
+    	out.writeObject(getAccountInfoMessage);
+    	
+    	returnMessage = (Message) in.readObject();
+    	return returnMessage;
+    }
+    
+    public ArrayList<Message> fetchAllAccountInfo() throws ClassNotFoundException, IOException {
+    	Message getAllAccountInfoMessage = new Message("GetAllAccountInfo");
+    	out.writeObject(getAllAccountInfoMessage);
+    	
+    	returnMessages = (ArrayList<Message>) in.readObject();
+    	return returnMessages;
+    }
+    
+    public boolean editAccountNickname(String accountNumber, String nickname) throws ClassNotFoundException, IOException {
+    	Message editAccountNicknameMessage = new Message("EditAccountNickname", accountNumber, nickname);
+    	out.writeObject(editAccountNicknameMessage);
+    	
+    	returnMessage = (Message) in.readObject();
+        
+        System.out.println(returnMessage.getMessageType());
+        
+        if (returnMessage.getMessageType().equals("Success")) {
+        	return true;
+        }
+        
+        return false;
     }
     
     // Close the socket
