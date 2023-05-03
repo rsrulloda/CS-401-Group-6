@@ -22,6 +22,18 @@ public class BankAccount {
         this.nickname = "";
     }
     
+    public BankAccount(String accountType, String accountNumber, float balance) {
+        if (accountType.equals("Checking")) {
+            this.accountType = "Checking";
+        } else if (accountType.equals("Savings")) {
+            this.accountType = "Savings";
+        }
+        
+        this.accountNumber = accountNumber;
+        this.balance = balance;
+        this.nickname = "";
+    }
+    
     public BankAccount(String accountType, String accountNumber, String nickname) {
         if (accountType.equals("Checking")) {
             this.accountType = "Checking";

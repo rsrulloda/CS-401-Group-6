@@ -99,14 +99,23 @@ class Server {
 		return amount;
 	}
 	
-    public void addAccount(String customerAccount) {
-
-    	for (BankAccount account : accounts) {
-            if (account.getAccountNumber().equals(customerAccount)) {
-                accounts.add(account);
-                break;
-            }
-        }
+    public static void addAccount(String customerUsername, String type) {
+    	
+		CustomerAccount currentCustomer = null;
+		System.out.println(currentCustomers.size());
+		
+		for(CustomerAccount account : currentCustomers) {
+			System.out.println(account.getUsername());
+			System.out.println(customerUsername);
+			if(account.getUsername().equals(customerUsername)) {
+				System.out.println("Account found");
+				currentCustomer = account;
+			}
+		}
+		
+		if (currentCustomer != null) {
+			currentCustomer.addAccount(type);
+		}
     }
     
     public void closeAccount(String accountNumber) {
@@ -349,6 +358,10 @@ class Server {
 						ArrayList<Message> messages = getAllAccountInfo(currentCustomer);
 						
 						out.writeObject(messages);
+					}
+					
+					if (message.getMessageType().equals("OpenBankAccount")) {
+						addAccount(currentCustomer, "Checking");
 					}
 					
 				}

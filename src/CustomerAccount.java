@@ -34,12 +34,21 @@ public class CustomerAccount {
         password = newPassword;
     }
 
-    public void addAccount(String type, float balance) {
+    public void addAccount(String type) {
     	// Temporary generation of an account number
     	int accountNumber = 1000 + accounts.size() + 1;
     	String accountNumberString = String.valueOf(accountNumber);
     	
         BankAccount newAccount = new BankAccount(type, accountNumberString);
+        accounts.add(newAccount);
+    }
+    
+    public void addAccount(String type, float balance) {
+    	// Temporary generation of an account number
+    	int accountNumber = 1000 + accounts.size() + 1;
+    	String accountNumberString = String.valueOf(accountNumber);
+    	
+        BankAccount newAccount = new BankAccount(type, accountNumberString, balance);
         accounts.add(newAccount);
     }
 
@@ -52,7 +61,7 @@ public class CustomerAccount {
         accounts.add(newAccount);
     }
 
-    public void editAccount(int accountNumber, String newNickname) {
+    public void editAccount(String accountNumber, String newNickname) {
         for (BankAccount account : accounts) {
             if (account.getAccountNumber().equals(accountNumber)) {
                 account.setNickname(newNickname);
@@ -61,7 +70,7 @@ public class CustomerAccount {
         }
     }
 
-    public void removeAccount(int accountNumber) {
+    public void removeAccount(String accountNumber) {
         for (BankAccount account : accounts) {
             if (account.getAccountNumber().equals(accountNumber)) {
                 accounts.remove(account);
