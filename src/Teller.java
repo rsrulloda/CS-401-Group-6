@@ -108,7 +108,7 @@ public class Teller {
         return false;
     }
 
-    public boolean transfer(BankAccount account1, BankAccount account2, float amount) throws IOException, ClassNotFoundException {
+    public boolean transferRequest(String account1, String account2, float amount) throws IOException, ClassNotFoundException {
         Message transferMessage = new Message("Transfer", account1, account2, amount);
         out.writeObject(transferMessage);
 
