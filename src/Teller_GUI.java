@@ -210,19 +210,18 @@ public class Teller_GUI {
 
         // Sets Center Panel
         JPanel centerPanel = new JPanel();
-
-        JLabel accountName = new JLabel("Account Name");
-        accountName.setBounds(10, 10, 80, 25);
-        centerPanel.add(accountName);
-
-        JLabel accountNumber = new JLabel("Account Number");
-        accountNumber.setBounds(40, 10, 80, 25);
-        centerPanel.add(accountNumber);
-
-        JLabel accountBalance = new JLabel("$Amount");
-        accountBalance.setBounds(70, 10, 80, 25);
-        accountBalance.setFont(new Font("Serif", Font.PLAIN, 20));
-        centerPanel.add(accountBalance);
+        
+        Message currentAccount = accounts.get(selectedAccountIndex);
+        
+        String accountInfoString = "Account Type: " + currentAccount.getAccountType() + "\n"
+		+ "Account Number: " + currentAccount.getAccountNumber() + "\n"
+		+ "Balance: " + String.valueOf(currentAccount.getBalance()) + "\n"
+		+ "Nickname: " + currentAccount.getNickname();
+        
+        JTextArea displayAccountInfo = new JTextArea(accountInfoString);
+        displayAccountInfo.setFont(new Font("Arial", Font.BOLD, 24));
+        
+        centerPanel.add(displayAccountInfo);
 
         // Sets Bottom Panel
         JPanel bottomPanel = new JPanel();
@@ -423,8 +422,25 @@ public class Teller_GUI {
     private class withdraw implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
+            
+            Message currentAccount = accounts.get(selectedAccountIndex);
+            
+            // Request the withdrawal amount
+            String input = JOptionPane.showInputDialog(null, "Please enter a withdrawal amount",
+                    "Withdrawal", JOptionPane.QUESTION_MESSAGE);
+            
+            float amount; 
+            
+            if (input == null) {
+                amount = 0;
+            } else {
+            	amount = Float.parseFloat(input);
+            }
+            
             try {
-				mainFrame();
+            	teller.withdrawRequest(currentAccount.getAccountNumber(), amount);
+            	accounts = teller.fetchAllAccountInfo();
+				accountFrame();
 			} catch (ClassNotFoundException | IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -435,8 +451,25 @@ public class Teller_GUI {
     private class deposit implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
+            
+            Message currentAccount = accounts.get(selectedAccountIndex);
+            
+            // Request the deposit amount
+            String input = JOptionPane.showInputDialog(null, "Please enter a deposit amount",
+                    "Deposit", JOptionPane.QUESTION_MESSAGE);
+            
+            float amount; 
+            
+            if (input == null) {
+                amount = 0;
+            } else {
+            	amount = Float.parseFloat(input);
+            }
+            
             try {
-				mainFrame();
+            	teller.depositRequest(currentAccount.getAccountNumber(), amount);
+               	accounts = teller.fetchAllAccountInfo();
+    			accountFrame();
 			} catch (ClassNotFoundException | IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
