@@ -1,4 +1,7 @@
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +16,9 @@ public class Teller_GUI {
     private JButton loginButton, logoutButton;
     
     private Teller teller = new Teller();
+    
+    private int selectedAccountIndex;
+    private ArrayList<Message> accounts;
 
     public Teller_GUI() {
         frame = new JFrame("Teller GUI - Teller Login");
@@ -40,6 +46,7 @@ public class Teller_GUI {
 
         frame.setSize(300, 150);
         frame.setLayout(null);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -74,9 +81,31 @@ public class Teller_GUI {
         frame.add(logoutButton);
 
         frame.setSize(300, 150);
+        frame.setLocationRelativeTo(null);
         frame.setLayout(null);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    // Function to allow JList to display multiline strings
+    public class MultilineCellRenderer extends JTextArea implements ListCellRenderer<String> {
+        public MultilineCellRenderer() {
+            setLineWrap(true);
+            setWrapStyleWord(true);
+        }
+
+        @Override
+        public Component getListCellRendererComponent(JList list, String value, int index, boolean isSelected, boolean cellHasFocus) {
+            setText(value);
+            if (isSelected) {
+                setBackground(list.getSelectionBackground());
+                setForeground(list.getSelectionForeground());
+            } else {
+                setBackground(list.getBackground());
+                setForeground(list.getForeground());
+            }
+            return this;
+        }
     }
     
     public void mainFrame() throws ClassNotFoundException, IOException{
@@ -102,39 +131,54 @@ public class Teller_GUI {
         bottomPanel.add(openAccountButton);
         bottomPanel.add(changePasswordButton);
 
-        // Sets ScrollPane for Accounts
+        // Sets JList for Accounts
+        
         JPanel panel = new JPanel();
         BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
         panel.setLayout(layout);
 
-        ArrayList<Message> accounts = teller.fetchAllAccountInfo();
+        accounts = teller.fetchAllAccountInfo();
+        
+        String[] titlesArray = new String[accounts.size()]; 
+    	String title;  
         
         for (int i = 0; i < accounts.size(); i++) {
-        	
-        	String buttonString = 
-        			"Account Type: " + accounts.get(i).getAccountType() + "\n"
-					+ "Account Number: " + accounts.get(i).getAccountNumber() + "\n"
-					+ "Balance: " + String.valueOf(accounts.get(i).getBalance()) + "\n"
-        			+ "Nickname: " + accounts.get(i).getNickname();
-        			
-            JButton button = new JButton(buttonString);
-            button.setPreferredSize(new Dimension(500, 200));
-            panel.add(button);
-        }
+        	Message currentAccount = accounts.get(i);
+        					
+        	titlesArray[i] = "Account Type: " + currentAccount.getAccountType() + "\n"
+					+ "Account Number: " + currentAccount.getAccountNumber() + "\n"
+					+ "Balance: " + String.valueOf(currentAccount.getBalance()) + "\n"
+        			+ "Nickname: " + currentAccount.getNickname();
+        } 
+ 
+        JList accountList = new JList(titlesArray);
+        frame.add(accountList);
 
 
-        JScrollPane scrollPane = new JScrollPane(panel);
+        // Add a ListSelectionListener to the accountList
+        accountList.addListSelectionListener(new ListSelectionListener() {
 
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				// TODO Auto-generated method stub
+				selectedAccountIndex = accountList.getSelectedIndex();
+			}
+        });
+
+        
+        accountList.setCellRenderer(new MultilineCellRenderer());
+        
         // Sets Main Panel
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(label, BorderLayout.NORTH);
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        mainPanel.add(accountList, BorderLayout.CENTER);
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         // Sets Frame Settings
         frame.add(mainPanel);
         frame.setSize(600, 700);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -199,6 +243,7 @@ public class Teller_GUI {
         // Sets Frame Settings
         frame.add(mainPanel);
         frame.setSize(600, 700);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -307,6 +352,11 @@ public class Teller_GUI {
     private class select implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
+            
+            accounts.get(selectedAccountIndex);
+            accountFrame();
+            
+            /*
             try {
 				mainFrame();
 			} catch (ClassNotFoundException e1) {
@@ -316,13 +366,16 @@ public class Teller_GUI {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+			*/
         }
     }
 
     private class openAccount implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
+            
             try {
+            	teller.openBankAccount();
 				mainFrame();
 			} catch (ClassNotFoundException | IOException e1) {
 				// TODO Auto-generated catch block
