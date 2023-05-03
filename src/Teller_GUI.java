@@ -158,6 +158,18 @@ public class Teller_GUI {
         // Sets Center Panel
         JPanel centerPanel = new JPanel();
 
+        JLabel accountName = new JLabel("Account Name");
+        accountName.setBounds(10, 10, 80, 25);
+        centerPanel.add(accountName);
+
+        JLabel accountNumber = new JLabel("Account Number");
+        accountNumber.setBounds(40, 10, 80, 25);
+        centerPanel.add(accountNumber);
+
+        JLabel accountBalance = new JLabel("$Amount");
+        accountBalance.setBounds(70, 10, 80, 25);
+        accountBalance.setFont(new Font("Serif", Font.PLAIN, 20));
+        centerPanel.add(accountBalance);
 
         // Sets Bottom Panel
         JPanel bottomPanel = new JPanel();
@@ -211,7 +223,7 @@ public class Teller_GUI {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private class tellerLogin implements ActionListener  {
+    private class tellerLogin implements ActionListener  { // completed
         public void actionPerformed(ActionEvent e) {
             String user = userText.getText().trim();
             String pass = String.valueOf(passText.getPassword()).trim();
@@ -229,21 +241,22 @@ public class Teller_GUI {
             if (loginResult) {
                 JOptionPane.showMessageDialog(null, "Login successful");
                 frame.dispose(); // close the login frame
-                customerLoginFrame();
+                //customerLoginFrame();
+                accountFrame();
             } else {
                 JOptionPane.showMessageDialog(null, "Invalid username or password");
             }
         }
     }
 
-    private class tellerLogout implements ActionListener {
+    private class tellerLogout implements ActionListener { // completed
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
             new Teller_GUI();
         }
     }
 
-    private class customerLogin implements ActionListener {
+    private class customerLogin implements ActionListener { // completed
         public void actionPerformed(ActionEvent e) {
             String user = userText.getText().trim();
             String pass = String.valueOf(passText.getPassword()).trim();
@@ -270,10 +283,10 @@ public class Teller_GUI {
         }
     }
 
-    private class customerLogout implements ActionListener {
+    private class customerLogout implements ActionListener { // completed
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
-            mainFrame();
+            customerLoginFrame();
         }
     }
 
@@ -340,17 +353,17 @@ public class Teller_GUI {
         }
     }
 
-    private class cancel implements ActionListener {
+    private class cancel implements ActionListener { // completed
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
-            mainFrame();
+            accountFrame();
         }
     }
 
     private class proceed implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
-            mainFrame();
+            accountFrame();
         }
     }
 
