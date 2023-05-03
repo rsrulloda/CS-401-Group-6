@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Teller_GUI {
     private JFrame frame;
@@ -77,8 +78,8 @@ public class Teller_GUI {
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
-
-    public void mainFrame(){
+    
+    public void mainFrame() throws ClassNotFoundException, IOException{
         // Create Frame
         frame = new JFrame("Teller GUI - Main");
 
@@ -106,15 +107,23 @@ public class Teller_GUI {
         BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
         panel.setLayout(layout);
 
-        for (int i = 0; i < 10; i++) {
-            JButton button = new JButton(String.valueOf(i));
+        ArrayList<Message> accounts = teller.fetchAllAccountInfo();
+        
+        for (int i = 0; i < accounts.size(); i++) {
+        	
+        	String buttonString = 
+        			"Account Type: " + accounts.get(i).getAccountType() + "\n"
+					+ "Account Number: " + accounts.get(i).getAccountNumber() + "\n"
+					+ "Balance: " + String.valueOf(accounts.get(i).getBalance()) + "\n"
+        			+ "Nickname: " + accounts.get(i).getNickname();
+        			
+            JButton button = new JButton(buttonString);
             button.setPreferredSize(new Dimension(500, 200));
             panel.add(button);
         }
 
+
         JScrollPane scrollPane = new JScrollPane(panel);
-
-
 
         // Sets Main Panel
         JPanel mainPanel = new JPanel();
@@ -241,8 +250,8 @@ public class Teller_GUI {
             if (loginResult) {
                 JOptionPane.showMessageDialog(null, "Login successful");
                 frame.dispose(); // close the login frame
-                //customerLoginFrame();
-                accountFrame();
+                customerLoginFrame();
+                //accountFrame();
             } else {
                 JOptionPane.showMessageDialog(null, "Invalid username or password");
             }
@@ -276,7 +285,12 @@ public class Teller_GUI {
                 JOptionPane.showMessageDialog(null, "Login successful");
                 frame.dispose(); // close the login frame
 
-                mainFrame();
+                try {
+					mainFrame();
+				} catch (ClassNotFoundException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
             } else {
                 JOptionPane.showMessageDialog(null, "Invalid username or password");
             }
@@ -293,63 +307,111 @@ public class Teller_GUI {
     private class select implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
-            mainFrame();
+            try {
+				mainFrame();
+			} catch (ClassNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
         }
     }
 
     private class openAccount implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
-            mainFrame();
+            try {
+				mainFrame();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
         }
     }
 
     private class changePassword implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
-            mainFrame();
+            try {
+				mainFrame();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
         }
     }
 
     private class closeAccount implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
-            mainFrame();
+            try {
+				mainFrame();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
         }
     }
 
     private class exit implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
-            mainFrame();
+            try {
+				mainFrame();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
         }
     }
 
     private class withdraw implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
-            mainFrame();
+            try {
+				mainFrame();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
         }
     }
 
     private class deposit implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
-            mainFrame();
+            try {
+				mainFrame();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
         }
     }
 
     private class transfer implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
-            mainFrame();
+            try {
+				mainFrame();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
         }
     }
 
     private class editName implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
-            mainFrame();
+            try {
+				mainFrame();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
         }
     }
 

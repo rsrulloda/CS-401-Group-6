@@ -193,7 +193,7 @@ class Server {
 		}
 	}
 	
-	public ArrayList<Message> getAllAccountInfo(String customerUsername) {
+	public static ArrayList<Message> getAllAccountInfo(String customerUsername) {
         CustomerAccount currentCustomer = null;
         System.out.println(currentCustomers.size());
         
@@ -218,9 +218,10 @@ class Server {
 	
 	public static void main(String[] args)
 	{
-		CustomerAccount c1 = new CustomerAccount("Customer1", "123");
+		CustomerAccount c1 = new CustomerAccount("Customer5", "123");
 		currentCustomers.add(c1);
 		c1.addAccount("Checking", 500);
+		c1.addAccount("Savings", 300);
 		
 		loadEmployeeAccounts();
 		
@@ -342,6 +343,12 @@ class Server {
 							out.writeObject(new Message("Success"));
 							System.out.println("Deposit");
 						}
+					}
+					
+					if (message.getMessageType().equals("GetAllAccountInfo")) {
+						ArrayList<Message> messages = getAllAccountInfo(currentCustomer);
+						
+						out.writeObject(messages);
 					}
 					
 				}
