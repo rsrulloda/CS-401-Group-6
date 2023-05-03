@@ -9,7 +9,7 @@ public class Teller_GUI {
     private JLabel userLabel, passLabel;
     private JTextField userText;
     private JPasswordField passText;
-    private JButton loginButton;
+    private JButton loginButton, logoutButton;
     
     private Teller teller = new Teller();
 
@@ -67,6 +67,11 @@ public class Teller_GUI {
         loginButton.addActionListener(new customerLogin());
         frame.add(loginButton);
 
+        logoutButton = new JButton("Logout");
+        logoutButton.setBounds(100, 80, 80, 25);
+        logoutButton.addActionListener(new tellerLogout());
+        frame.add(logoutButton);
+
         frame.setSize(300, 150);
         frame.setLayout(null);
         frame.setVisible(true);
@@ -79,9 +84,13 @@ public class Teller_GUI {
 
         // Create Buttons and Label
         JButton logoutButton = new JButton("Logout");
+        logoutButton.addActionListener(new customerLogout());
         JButton selectButton = new JButton("Select");
+        selectButton.addActionListener(new select());
         JButton openAccountButton = new JButton("Open Account");
+        openAccountButton.addActionListener(new openAccount());
         JButton changePasswordButton = new JButton("Change Password");
+        changePasswordButton.addActionListener(new changePassword());
         JLabel label = new JLabel("Select an Account");
 
         // Puts Buttons in Bottom Panel
@@ -127,11 +136,17 @@ public class Teller_GUI {
 
         // Create Buttons and Label
         JButton closeAccountButton = new JButton("Close Account");
+        closeAccountButton.addActionListener(new closeAccount());
         JButton exitButton = new JButton("Exit");
+        exitButton.addActionListener(new exit());
         JButton withdrawButton = new JButton("Withdraw");
+        withdrawButton.addActionListener(new withdraw());
         JButton depositButton = new JButton("Deposit");
+        depositButton.addActionListener(new deposit());
         JButton transferButton = new JButton("Transfer");
+        transferButton.addActionListener(new transfer());
         JButton editNameButton = new JButton("Edit Name");
+        editNameButton.addActionListener(new editName());
         JLabel label = new JLabel("Current Account");
 
         // Sets Top Panel
@@ -172,7 +187,9 @@ public class Teller_GUI {
 
         // Sets Buttons and Label
         JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(new cancel());
         JButton proceedButton = new JButton("Proceed");
+        proceedButton.addActionListener(new proceed());
         JLabel label = new JLabel("Are you sure the customer wishes to close this account?");
 
         // Sets Bottom Panel
@@ -212,9 +229,17 @@ public class Teller_GUI {
             if (loginResult) {
                 JOptionPane.showMessageDialog(null, "Login successful");
                 frame.dispose(); // close the login frame
+                customerLoginFrame();
             } else {
                 JOptionPane.showMessageDialog(null, "Invalid username or password");
             }
+        }
+    }
+
+    private class tellerLogout implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            new Teller_GUI();
         }
     }
 
@@ -223,7 +248,6 @@ public class Teller_GUI {
             String user = userText.getText();
             String pass = String.valueOf(passText.getPassword());
 
-            
             
             // check user credentials here
             if (user.equals("admin") && pass.equals("password")) {
@@ -236,6 +260,91 @@ public class Teller_GUI {
             }
         }
     }
+
+    private class customerLogout implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            mainFrame();
+        }
+    }
+
+    private class select implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            mainFrame();
+        }
+    }
+
+    private class openAccount implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            mainFrame();
+        }
+    }
+
+    private class changePassword implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            mainFrame();
+        }
+    }
+
+    private class closeAccount implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            mainFrame();
+        }
+    }
+
+    private class exit implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            mainFrame();
+        }
+    }
+
+    private class withdraw implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            mainFrame();
+        }
+    }
+
+    private class deposit implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            mainFrame();
+        }
+    }
+
+    private class transfer implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            mainFrame();
+        }
+    }
+
+    private class editName implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            mainFrame();
+        }
+    }
+
+    private class cancel implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            mainFrame();
+        }
+    }
+
+    private class proceed implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            mainFrame();
+        }
+    }
+
 
 
     public static void main(String[] args) {
