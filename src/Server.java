@@ -218,11 +218,7 @@ class Server {
 	
 	public static void main(String[] args)
 	{
-		CustomerAccount c1 = new CustomerAccount("Customer5", "123");
-		currentCustomers.add(c1);
-		c1.addAccount("Checking", 500);
-		c1.addAccount("Savings", 300);
-		
+		loadCustomerAccounts();
 		loadEmployeeAccounts();
 		
 		ServerSocket server = null;
