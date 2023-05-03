@@ -1,3 +1,4 @@
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -53,6 +54,10 @@ class ATM {
             e.printStackTrace();
         } finally {
             atm.close();
+
         }
+
+        accountInfoArea.setText(sb.toString());
+        messageLabel.setText("Welcome " + customerAccount.getUsername() + ".");
     }
 }
