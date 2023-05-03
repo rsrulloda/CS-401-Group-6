@@ -9,6 +9,7 @@ public class Message implements Serializable {
     //For AccountInfo
     protected String accountType;
     protected String accountNumber;
+    protected String accountNumber2;
     protected float balance;
     protected String nickname;
     
@@ -18,6 +19,8 @@ public class Message implements Serializable {
     
     // For withdraw/deposit
     protected float amount;
+
+
     
     //For Transfer
     protected String account1;
@@ -63,6 +66,16 @@ public class Message implements Serializable {
     		this.nickname = input2;
     	}
         
+    }
+
+    public Message(String messageType, String account1, String account2, float amount) {
+        this.messageType = messageType;
+
+        if (messageType.equals("Transfer")) {
+            this.accountNumber = account1;
+            this.accountNumber2 = account2;
+            this.amount = amount;
+        }
     }
     
     public Message(String messageType, String username, String password, String accountType, String accountNumber, float balance, String nickname, Boolean login) {
