@@ -8,7 +8,7 @@ class Server {
 	
 	protected static ArrayList<ClientHandler> currentClients;
 	//protected ArrayList<EmployeeAccount> currentEmployees;
-	protected static ArrayList<CustomerAccount> currentCustomers;
+	protected static ArrayList<CustomerAccount> currentCustomers = new ArrayList<CustomerAccount>();;
 	protected static ArrayList<BankAccount> accounts;
 
 	
@@ -21,14 +21,28 @@ class Server {
 		return false;
     }
 	
-	public static float withdraw(String accountNumber, float amount) {
-		for(BankAccount account : accounts) {
-			if(account.getAccountNumber().equals(accountNumber)) {
-				amount = account.getBalance() - amount; 
+	public static boolean withdraw(String customerUsername,String accountNumber, float amount) {
+		
+		CustomerAccount currentCustomer = null;
+		System.out.println(currentCustomers.size());
+		
+		for(CustomerAccount account : currentCustomers) {
+			System.out.println(account.getUsername());
+			System.out.println(customerUsername);
+			if(account.getUsername().equals(customerUsername)) {
+				System.out.println("Account found");
+				currentCustomer = account;
 			}
 		}
 		
-		return amount;
+		for(BankAccount account :  currentCustomer.getAccounts()) {
+			if(account.getAccountNumber().equals(accountNumber)) {
+				account.withdraw(amount);
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	public static float deposit(String accountNumber, float amount) {
@@ -98,6 +112,10 @@ class Server {
 	
 	public static void main(String[] args)
 	{
+		CustomerAccount c1 = new CustomerAccount("Customer1", "123");
+		currentCustomers.add(c1);
+		c1.addAccount("Checking", 500);
+		
 		ServerSocket server = null;
 
 		try {
@@ -108,7 +126,7 @@ class Server {
 			while (true) {
 
 				Socket client = server.accept();
-				System.out.println("New client connected "+ client.getInetAddress().getHostAddress());
+				System.out.println("New client connected " + client.getInetAddress().getHostAddress());
 				ClientHandler clientSock = new ClientHandler(client);
 				new Thread(clientSock).start();
 			}
@@ -166,17 +184,27 @@ class Server {
 
 					if (message.getMessageType().equals("CustomerLogin")) {
 						boolean loginResult = verifyCustomerLogin(message.getUsername(), message.getPassword());
+						
 						if(loginResult) {
+							currentCustomer = message.getUsername();
 							out.writeObject(new Message("CustomerLogin"));
 							System.out.println("CustomerLogin");
 						}
 					}
 					
+					if (message.getMessageType().equals("Withdraw")) {
+						boolean loginResult = withdraw(currentCustomer, message.getAccountNumber(), message.getAmount());
+						if(loginResult) {
+							out.writeObject(new Message("Withdraw"));
+							System.out.println("Withdraw");
+						}
+					}
+					
 					else if (message.getMessageType().equals("LogoutCustomer")) {
-						boolean logoutResult = logoutCustomer();
-						if(logoutResult) {
-							state =  message.getLogin();
-							out.writeObject(new Message("success"));
+						boolean loginResult = logoutCustomer();
+						if(loginResult) {
+							out.writeObject(new Message("LogoutCustomer"));
+							System.out.println("LogoutCustomer");
 						}
 					}
 				}

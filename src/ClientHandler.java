@@ -6,7 +6,7 @@ import java.util.*;
 class ClientHandler {
 	
 	// driver code
-	public static void main(String[] args) throws IOException
+	public static void main(String[] args) throws IOException, ClassNotFoundException
 	{
 
 		try (Socket socket = new Socket("localhost", 1234)) {
@@ -22,40 +22,27 @@ class ClientHandler {
 
 			// object of scanner class
 			Scanner sc = new Scanner(System.in);
-	        Message returnMessage = null;
 
+			
+			// Return message
+			Message returnMessage;
+			
 	        // Create and send a login message
 	        System.out.println("Attemping Connection...");
 	        
-	        Message customerLogin = new Message("CustomerLogin");
-	        out.writeObject(customerLogin);
+        	Message customerLogin1 = new Message("CustomerLogin", "Customer1", "123");
+        	out.writeObject(customerLogin1);
+        	
+        	returnMessage = (Message) in.readObject();
+        	System.out.println(returnMessage.getMessageType());
+        	
+        	
+        	Message withdraw1 = new Message("Withdraw", "1001", 5);
+        	out.writeObject(withdraw1);
+        	
+        	returnMessage = (Message) in.readObject();
+        	System.out.println(returnMessage.getMessageType());
 	        
-	        Message logoutCustomer = new Message("LogoutCustomer");
-	        out.writeObject(logoutCustomer);
-
-	        try {
-	        	// When a success message is returned, write to console
-				returnMessage = (Message) in.readObject();
-				
-				if (returnMessage.getMessageType().equals("CustomerLogin")) {
-					System.out.println("Success!");
-				}
-				
-			} catch (ClassNotFoundException | IOException e) {
-				e.printStackTrace();
-			}
-	        
-	        try {
-	        	// When a success message is returned, write to console
-				returnMessage = (Message) in.readObject();
-				
-				if (returnMessage.getMessageType().equals("LogoutCustomer")) {
-					System.out.println("Success!");
-				}
-				
-			} catch (ClassNotFoundException | IOException e) {
-				e.printStackTrace();
-			}
 	        
 	        sc.close();
 	        System.out.println("Closing socket");
