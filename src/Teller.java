@@ -108,8 +108,9 @@ public class Teller {
         return false;
     }
 
-    public void transfer(BankAccount account1, BankAccount account2, float amount) {
-    	
+    public void transfer(String account1, String account2, float amount) throws IOException {
+    	Message transferMessage = new Message("Transfer", account1, account2, amount);
+    	out.writeObject(transferMessage);
     }
 
 
@@ -117,8 +118,8 @@ public class Teller {
     	
     }
 
-    public void openBankAccount() throws IOException {
-    	Message openBankAccountMessage = new Message("OpenBankAccount");
+    public void openBankAccount(String accountType) throws IOException {
+    	Message openBankAccountMessage = new Message("OpenBankAccount", accountType);
     	out.writeObject(openBankAccountMessage);
     }
     
@@ -138,21 +139,11 @@ public class Teller {
     	return returnMessages;
     }
     
-    public boolean editAccountNickname(String accountNumber, String nickname) throws ClassNotFoundException, IOException {
+    public void editAccountNickname(String accountNumber, String nickname) throws ClassNotFoundException, IOException {
     	Message editAccountNicknameMessage = new Message("EditAccountNickname", accountNumber, nickname);
     	out.writeObject(editAccountNicknameMessage);
-    	
-    	returnMessage = (Message) in.readObject();
-        
-        System.out.println(returnMessage.getMessageType());
-        
-        if (returnMessage.getMessageType().equals("Success")) {
-        	return true;
-        }
-        
-        return false;
     }
-    
+ 
     // Close the socket
     public void close() throws IOException {
         if (socket != null) {

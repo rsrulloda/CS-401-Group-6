@@ -83,22 +83,47 @@ class Server {
 		return true;
 	}
 	
-	public static float transfer(String account1, String account2, float amount) {
+	public static boolean transfer(String customerUsername, String accountNumber, String accountNumber1, float amount) {
 
-		for(BankAccount account : accounts) {
-			if(account.getAccountNumber().equals(account1)) {
-				amount = account.getBalance() - amount;
-				account.getAccountNumber().equals(account2);
-				
-				if(account.getAccountNumber().equals(account2)){
-					amount = account.getBalance() + amount;
-				}
-			}
-		}
-		
-		return amount;
-	}
-	
+        CustomerAccount currentCustomer = null;
+        System.out.println(currentCustomers.size());
+
+        for(CustomerAccount account : currentCustomers) {
+            System.out.println(account.getUsername());
+            System.out.println(customerUsername);
+            if(account.getUsername().equals(customerUsername)) {
+                System.out.println("Account found");
+                currentCustomer = account;
+            }
+        }
+
+        for(BankAccount account :  currentCustomer.getAccounts()) {
+            if(account.getAccountNumber().equals(accountNumber)) {
+                account.withdraw(amount);
+                System.out.println(account.getBalance());
+            }
+        }
+
+        for(CustomerAccount account : currentCustomers) {
+            System.out.println(account.getUsername());
+            System.out.println(customerUsername);
+            if(account.getUsername().equals(customerUsername)) {
+                System.out.println("Account found");
+                currentCustomer = account;
+            }
+        }
+
+        for(BankAccount account :  currentCustomer.getAccounts()) {
+            if(account.getAccountNumber().equals(accountNumber1)) {
+                account.deposit(amount);
+                System.out.println(account.getBalance());
+            }
+        }
+
+        return true;
+
+    }
+
     public static void addAccount(String customerUsername, String type) {
     	
 		CustomerAccount currentCustomer = null;
@@ -128,14 +153,32 @@ class Server {
         }
     }
     
-    public void editAccount(String accountNumber, String nickname) {
+    public static void editAccount(String customerUsername, String accountNumber, String nickname) {
+    	System.out.println("editAccount was called");
+    	
+		CustomerAccount currentCustomer = null;
+		System.out.println(currentCustomers.size());
+		
+		for(CustomerAccount account : currentCustomers) {
+			System.out.println(account.getUsername());
+			System.out.println(customerUsername);
+			if(account.getUsername().equals(customerUsername)) {
+				System.out.println("Account found");
+				currentCustomer = account;
+			}
+		}
 
-    	for (BankAccount account : accounts) {
+		if (currentCustomer != null) {
+			currentCustomer.editAccount(accountNumber, nickname);
+		}
+    	
+	   	for (BankAccount account : currentCustomer.getAccounts()) {
             if (account.getAccountNumber().equals(accountNumber)) {
-                account.setNickname(nickname);
+                System.out.println("The new nickname i: " + account.getNickname());
                 break;
             }
         }
+		
     }
 
 	public static boolean logoutCustomer(){
@@ -349,6 +392,11 @@ class Server {
 							System.out.println("Deposit");
 						}
 					}
+					if (message.getMessageType().equals("Transfer")) {
+                        transfer(currentCustomer, message.getAccount1(), message.getAccount2(), message.getAmount());
+                        
+                        System.out.println("Transfer completed");
+                    }
 					
 					if (message.getMessageType().equals("GetAllAccountInfo")) {
 						ArrayList<Message> messages = getAllAccountInfo(currentCustomer);
@@ -357,9 +405,12 @@ class Server {
 					}
 					
 					if (message.getMessageType().equals("OpenBankAccount")) {
-						addAccount(currentCustomer, "Checking");
+						addAccount(currentCustomer, message.getAccountType());
 					}
 					
+					if (message.getMessageType().equals("EditAccountNickname")) {
+						editAccount(currentCustomer, message.getAccountNumber(), message.getNickname());
+					}
 				}
 			}
 			catch (EOFException e) {

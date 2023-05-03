@@ -18,6 +18,7 @@ public class Teller_GUI {
     private Teller teller = new Teller();
     
     private int selectedAccountIndex;
+    private int selectedTransferAccountIndex;
     private ArrayList<Message> accounts;
 
     public Teller_GUI() {
@@ -139,19 +140,20 @@ public class Teller_GUI {
 
         accounts = teller.fetchAllAccountInfo();
         
-        String[] titlesArray = new String[accounts.size()]; 
-    	String title;  
+        String[] accountsArray = new String[accounts.size()]; 
+    	String account;  
         
         for (int i = 0; i < accounts.size(); i++) {
         	Message currentAccount = accounts.get(i);
         					
-        	titlesArray[i] = "Account Type: " + currentAccount.getAccountType() + "\n"
+        	accountsArray[i] = "Account Type: " + currentAccount.getAccountType() + "\n"
 					+ "Account Number: " + currentAccount.getAccountNumber() + "\n"
 					+ "Balance: " + String.valueOf(currentAccount.getBalance()) + "\n"
-        			+ "Nickname: " + currentAccount.getNickname();
+        			+ "Nickname: " + currentAccount.getNickname() + "\n";
         } 
  
-        JList accountList = new JList(titlesArray);
+        JList accountList = new JList(accountsArray);
+        accountList.setFont(new Font("Arial", Font.BOLD, 12));
         frame.add(accountList);
 
 
@@ -162,6 +164,76 @@ public class Teller_GUI {
 			public void valueChanged(ListSelectionEvent e) {
 				// TODO Auto-generated method stub
 				selectedAccountIndex = accountList.getSelectedIndex();
+			}
+        });
+
+        
+        accountList.setCellRenderer(new MultilineCellRenderer());
+        
+        // Sets Main Panel
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.add(label, BorderLayout.NORTH);
+        mainPanel.add(accountList, BorderLayout.CENTER);
+        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+        // Sets Frame Settings
+        frame.add(mainPanel);
+        frame.setSize(600, 700);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+    
+    public void transferFrame() throws ClassNotFoundException, IOException{
+        // Create Frame
+        frame = new JFrame("Teller GUI - Main");
+
+        // Create Buttons and Label
+        JButton transferButton = new JButton("Transfer");
+        transferButton.addActionListener(new transferAction());
+        JLabel label = new JLabel("Select an Account");
+        
+        // Puts Buttons in Bottom Panel
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new FlowLayout());
+        bottomPanel.add(transferButton);
+        
+        // Sets JList for Accounts
+        JPanel panel = new JPanel();
+        BoxLayout layout = new BoxLayout(panel, BoxLayout.Y_AXIS);
+        panel.setLayout(layout);
+
+        accounts = teller.fetchAllAccountInfo();
+        
+        String[] accountsArray = new String[accounts.size()]; 
+    	String account;  
+        
+        for (int i = 0; i < accounts.size(); i++) {
+        	if (i == selectedAccountIndex) {
+        		continue;
+        	}
+        	
+        	Message currentAccount = accounts.get(i);
+        					
+        	accountsArray[i] = "Account Type: " + currentAccount.getAccountType() + "\n"
+					+ "Account Number: " + currentAccount.getAccountNumber() + "\n"
+					+ "Balance: " + String.valueOf(currentAccount.getBalance()) + "\n"
+        			+ "Nickname: " + currentAccount.getNickname() + "\n";
+        } 
+ 
+        JList accountList = new JList(accountsArray);
+        accountList.setFont(new Font("Arial", Font.BOLD, 12));
+        frame.add(accountList);
+
+
+        // Add a ListSelectionListener to the accountList
+        accountList.addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				// TODO Auto-generated method stub
+				selectedTransferAccountIndex = accountList.getSelectedIndex();
 			}
         });
 
@@ -373,8 +445,32 @@ public class Teller_GUI {
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
             
+    		// Request the type
+    		String accountType;
+    		int choice;
+    		
+    		 String[] accountTypes = {
+    				 	"Checking",
+    				 	"Savings",
+    				 	};
+    		 
+    		 choice = JOptionPane.showOptionDialog(null,
+    				 "Select a bank account type", 
+    				 "Account Type", 
+    				 JOptionPane.OK_OPTION, 
+    				 JOptionPane.QUESTION_MESSAGE, 
+    				 null, 
+    				 accountTypes,
+    				 accountTypes[accountTypes.length - 1]);
+    		 
+    		if (choice == -1) {
+    			return;		// dialog was cancelled
+    		}
+    		 
+    		accountType = accountTypes[choice];
+            
             try {
-            	teller.openBankAccount();
+            	teller.openBankAccount(accountType);
 				mainFrame();
 			} catch (ClassNotFoundException | IOException e1) {
 				// TODO Auto-generated catch block
@@ -464,8 +560,7 @@ public class Teller_GUI {
                 amount = 0;
             } else {
             	amount = Float.parseFloat(input);
-            }
-            
+            }          
             try {
             	teller.depositRequest(currentAccount.getAccountNumber(), amount);
                	accounts = teller.fetchAllAccountInfo();
@@ -481,7 +576,37 @@ public class Teller_GUI {
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
             try {
-				mainFrame();
+            	transferFrame();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        }
+    }
+    
+    private class transferAction implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose(); // close the login frame
+            
+            Message currentAccount1 = accounts.get(selectedAccountIndex);
+            Message currentAccount2 = accounts.get(selectedTransferAccountIndex);
+            // Request the deposit amount
+            String input = JOptionPane.showInputDialog(null, "Please enter a transfer amount",
+                    "Transfer", JOptionPane.QUESTION_MESSAGE);
+            
+            float amount;
+            
+            if (input == null) {
+                amount = 0;
+            } else {
+            	amount = Float.parseFloat(input);
+            } 
+            
+            
+            try {
+            	teller.transfer(currentAccount1.getAccountNumber(), currentAccount2.getAccountNumber(), amount);
+               	accounts = teller.fetchAllAccountInfo();
+    			accountFrame();
 			} catch (ClassNotFoundException | IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -490,10 +615,23 @@ public class Teller_GUI {
     }
 
     private class editName implements ActionListener {
+    	
         public void actionPerformed(ActionEvent e) {
             frame.dispose(); // close the login frame
+            
+            Message currentAccount = accounts.get(selectedAccountIndex);
+            
+            // Request the deposit amount
+            String input = JOptionPane.showInputDialog(null, "Please enter a nickname",
+                    "Edit Nickname", JOptionPane.QUESTION_MESSAGE);
+   
+            String newNickname = String.valueOf(input);
             try {
-				mainFrame();
+            	
+            	teller.editAccountNickname(currentAccount.getAccountNumber(), newNickname);
+            	accounts = teller.fetchAllAccountInfo();
+            	accountFrame();
+    			
 			} catch (ClassNotFoundException | IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

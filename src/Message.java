@@ -19,6 +19,10 @@ public class Message implements Serializable {
     // For withdraw/deposit
     protected float amount;
     
+    //For Transfer
+    protected String account1;
+    protected String account2;
+    
     
     // Withdraw/Deposit Message
     public Message(String messageType, String accountNumber, float amount) {
@@ -27,10 +31,16 @@ public class Message implements Serializable {
         this.accountNumber = accountNumber;
     }
     
-    // GetAccountInfo Message
-    public Message(String messageType, String accountNumber) {
-    	this.messageType = messageType;
-    	this.accountNumber = accountNumber;
+    // GetAccountInfo/OpenBankAccount Message
+    public Message(String messageType, String input1) {
+    	if (messageType.equals("GetAccountInfo")) {
+    		this.messageType = messageType;
+        	this.accountNumber = input1;
+    	} else if (messageType.equals("OpenBankAccount")) {
+    		this.messageType = messageType;
+    		this.accountType = input1;
+    	}
+    	
     }
     
     public Message(String messageType, String accountType, String accountNumber, float balance, String nickname) {
@@ -74,7 +84,23 @@ public class Message implements Serializable {
         
     }
         
-    public String getMessageType() {
+    // Transfer message
+    public Message(String messageType, String account1, String account2, float amount) {
+    	this.messageType = messageType;
+    	this.account1 = account1;
+    	this.account2 = account2;
+    	this.amount = amount;
+	}
+
+    public String getAccount1() {
+    	return account1;
+    }
+    
+    public String getAccount2() {
+    	return account2;
+    }
+    
+	public String getMessageType() {
         return messageType;
     }
     
