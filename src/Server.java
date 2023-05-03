@@ -8,7 +8,7 @@ class Server {
 	
 	protected static ArrayList<ClientHandler> currentClients;
 	//protected ArrayList<EmployeeAccount> currentEmployees;
-	protected static ArrayList<CustomerAccount> currentCustomers = new ArrayList<CustomerAccount>();;
+	protected static ArrayList<CustomerAccount> currentCustomers;
 	protected static ArrayList<BankAccount> accounts;
 
 	
@@ -21,28 +21,14 @@ class Server {
 		return false;
     }
 	
-	public static boolean withdraw(String customerUsername,String accountNumber, float amount) {
-		
-		CustomerAccount currentCustomer = null;
-		System.out.println(currentCustomers.size());
-		
-		for(CustomerAccount account : currentCustomers) {
-			System.out.println(account.getUsername());
-			System.out.println(customerUsername);
-			if(account.getUsername().equals(customerUsername)) {
-				System.out.println("Account found");
-				currentCustomer = account;
-			}
-		}
-		
-		for(BankAccount account :  currentCustomer.getAccounts()) {
+	public static float withdraw(String accountNumber, float amount) {
+		for(BankAccount account : accounts) {
 			if(account.getAccountNumber().equals(accountNumber)) {
-				account.withdraw(amount);
-				return true;
+				amount = account.getBalance() - amount; 
 			}
 		}
 		
-		return false;
+		return amount;
 	}
 	
 	public static float deposit(String accountNumber, float amount) {
@@ -89,6 +75,8 @@ class Server {
                 break;
             }
         }
+
+
     }
     
     public void editAccount(String accountNumber, String nickname) {
@@ -109,13 +97,46 @@ class Server {
 		}
 		return false;
 	}
+
+	public static void loadCustomerAccounts() {
+		currentCustomers = new ArrayList<CustomerAccount>();
+
+		try {
+			File file = new File("../CS-401-Group-6/customerdata/customeraccounts");
+			Scanner scanner = new Scanner(file); // finds file
+			scanner.useDelimiter(",|\\n"); // uses commas and new line to separate values
+			int count = 0;
+
+			while(scanner.hasNext()) { // keeps looping until no more values found
+				String username = scanner.next();
+
+				if(!username.equals("")) {
+					String password = scanner.next();
+
+					CustomerAccount c = new CustomerAccount(username, password);
+					currentCustomers.add(c);
+				} else {
+					break;
+				}
+			}
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found");
+		}
+	}
+
+	public static void loadBankAccounts(CustomerAccount customerAccount) {
+
+	}
 	
 	public static void main(String[] args)
 	{
-		CustomerAccount c1 = new CustomerAccount("Customer1", "123");
-		currentCustomers.add(c1);
-		c1.addAccount("Checking", 500);
-		
+		loadCustomerAccounts();
+
+		for(int i=0;i<currentCustomers.size();i++) {
+			System.out.println(currentCustomers.get(i).getUsername());
+		}
+
 		ServerSocket server = null;
 
 		try {
@@ -126,7 +147,7 @@ class Server {
 			while (true) {
 
 				Socket client = server.accept();
-				System.out.println("New client connected " + client.getInetAddress().getHostAddress());
+				System.out.println("New client connected "+ client.getInetAddress().getHostAddress());
 				ClientHandler clientSock = new ClientHandler(client);
 				new Thread(clientSock).start();
 			}
@@ -184,27 +205,17 @@ class Server {
 
 					if (message.getMessageType().equals("CustomerLogin")) {
 						boolean loginResult = verifyCustomerLogin(message.getUsername(), message.getPassword());
-						
 						if(loginResult) {
-							currentCustomer = message.getUsername();
 							out.writeObject(new Message("CustomerLogin"));
 							System.out.println("CustomerLogin");
 						}
 					}
 					
-					if (message.getMessageType().equals("Withdraw")) {
-						boolean loginResult = withdraw(currentCustomer, message.getAccountNumber(), message.getAmount());
-						if(loginResult) {
-							out.writeObject(new Message("Withdraw"));
-							System.out.println("Withdraw");
-						}
-					}
-					
 					else if (message.getMessageType().equals("LogoutCustomer")) {
-						boolean loginResult = logoutCustomer();
-						if(loginResult) {
-							out.writeObject(new Message("LogoutCustomer"));
-							System.out.println("LogoutCustomer");
+						boolean logoutResult = logoutCustomer();
+						if(logoutResult) {
+							state =  message.getLogin();
+							out.writeObject(new Message("success"));
 						}
 					}
 				}
