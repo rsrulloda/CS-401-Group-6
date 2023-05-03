@@ -5,27 +5,28 @@ public class BankAccount {
         Savings
     }
 
-    private AccountType accountType;
+    private String accountType;
     private String accountNumber;
     private float balance;
     private String nickname;
 
     public BankAccount(String accountType, String accountNumber) {
         if (accountType.equals("Checking")) {
-            this.accountType = AccountType.Checking;
+            this.accountType = "Checking";
         } else if (accountType.equals("Savings")) {
-            this.accountType = AccountType.Savings;
+            this.accountType = "Savings";
         }
         
         this.accountNumber = accountNumber;
         this.balance = 0;
+        this.nickname = "";
     }
     
     public BankAccount(String accountType, String accountNumber, String nickname) {
         if (accountType.equals("Checking")) {
-            this.accountType = AccountType.Checking;
+            this.accountType = "Checking";
         } else if (accountType.equals("Savings")) {
-            this.accountType = AccountType.Savings;
+            this.accountType = "Savings";
         }
             
         this.accountNumber = accountNumber;
@@ -33,7 +34,7 @@ public class BankAccount {
         this.nickname = nickname;
     }
 
-    public AccountType getAccountType() {
+    public String getAccountType() {
         return accountType;
     }
 
