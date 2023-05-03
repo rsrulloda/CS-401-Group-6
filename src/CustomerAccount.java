@@ -36,8 +36,7 @@ public class CustomerAccount {
 
     public void addAccount(String type, float balance) {
     	// Temporary generation of an account number
-    	Random random = new Random();
-    	int accountNumber = random.nextInt(999) + 1000;
+    	int accountNumber = 1000 + accounts.size() + 1;
     	String accountNumberString = String.valueOf(accountNumber);
     	
         BankAccount newAccount = new BankAccount(type, accountNumberString);
@@ -46,8 +45,7 @@ public class CustomerAccount {
 
     public void addAccount(String type, float balance, String nickname) {
     	// Temporary generation of an account number
-    	Random random = new Random();
-    	int accountNumber = random.nextInt(999) + 1000;
+    	int accountNumber = 1000 + accounts.size() + 1;
     	String accountNumberString = String.valueOf(accountNumber);
     	
     	BankAccount newAccount = new BankAccount(type, accountNumberString, nickname);

@@ -1,51 +1,58 @@
-public class ATM 
-{
-	private Customer currentCustomer;
-	
-    public void loginCustomer(Message<CustomerLogin> loginMessage)
-    {
-        CustomerLogin login = loginMessage.getData();
-        currentCustomer = new Customer(login.getUsername(), login.getPassword());
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+class ATM {
+    private Socket socket;
+    private InputStream inputStream;
+    private OutputStream outputStream;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
+
+    public ATM() {
+        try {
+			socket = new Socket("localhost", 1234);
+	        inputStream = socket.getInputStream();
+	        outputStream = socket.getOutputStream();
+	        out = new ObjectOutputStream(outputStream);
+	        in = new ObjectInputStream(inputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+
+    public void loginCustomer(String username, String password) throws IOException {
+        Message loginCustomer = new Message("CustomerLogin", username, password);
+        out.writeObject(loginCustomer);	
+        
+        System.out.println("Logging in customer");
     }
     
-    public void logoutCustomer(Message<CustomerLogout> logoutMessage)
-    {
-        currentCustomer = null;
+    public void logoutCustomer() throws IOException {
+    	Message logoutCustomer = new Message("CustomerLogout");
+    	out.writeObject(logoutCustomer);
+    	
+    	System.out.println("Logging out customer");
     }
-    
-    public void withdrawRequest(int accountNumber, double amount) 
-    {
-        if (currentCustomer != null) 
-        {
-        	
-        } 
-        else
-        {
-        	
+
+    public void close() throws IOException {
+        if (socket != null) {
+            socket.close();
         }
     }
-    
-    public void depositRequest(int accountNumber, double amount)
-    {
-        if (currentCustomer != null) 
-        {
-        	
-        } 
-        else 
-        {
-        	
-        }
-    }
-    
-    public void transfer(int account1, int account2, double amount)
-    {
-        if (currentCustomer != null)
-        {
-        	
-        } 
-        else 
-        {
-        	
+
+    public static void main(String[] args) throws IOException {
+        ATM atm = new ATM();
+        
+        String username = "user";
+        String password = "password";
+
+        try {
+            atm.loginCustomer(username, password);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            atm.close();
         }
     }
 }
